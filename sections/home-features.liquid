@@ -1,0 +1,138 @@
+{% if section.settings.image_enabled %}
+{% assign grid_width = "large--one-half" %}
+{% else %}
+{% assign grid_width = "large--one-whole" %}
+{% endif %}
+
+<!-- /sections/home-features.liquid -->
+<div class="grid--full home-promotion-block card-shadow {% if section.settings.id == "left" %}feature-flex{% else %}feature-flex-right{% endif %} home-reveal">
+  {% if section.settings.id == 'left' %}
+  
+    {% if section.settings.image_enabled %}
+      {% if section.settings.image == blank %}
+      <div class="grid__item large--one-half medium-down--one-whole left-image placeholder-features"></div>
+      {% else %}
+      <div class="grid__item large--one-half medium-down--one-whole left-image {{section.settings.feature_image_position}} lazyload lazypreload" 
+      data-bgset="{% include 'bgset', image: section.settings.image %}"
+      data-sizes="auto"
+      data-parent-fit="cover" 
+      style="background-image: url({{ section.settings.image | img_url: "300x300"}});" ></div>
+      {% endif %}
+    {% endif %}
+  
+  <div class="grid__item {{ grid_width }} medium-down--one-whole right-text text-center">
+    <div class="feature-content">
+      {% if section.settings.title != blank %}
+      <h1 class="black">{{ section.settings.title | escape }}</h1>
+      {% endif %}
+      {% if section.settings.subheading_richtext != blank %}
+      <div class="h5">{{ section.settings.subheading_richtext  }}</div>
+      {% endif %}
+      {% if section.settings.link != blank %}<a href="{{section.settings.link}}" class="btn">{{ section.settings.button | escape }}</a>{% endif %}
+    </div>
+  </div>
+  {% else %}
+   <div class="grid__item {{ grid_width }} medium-down--one-whole right-text text-center">
+    <div class="feature-content">
+      {% if section.settings.title != blank %}
+      <h1 class="black">{{ section.settings.title | escape }}</h1>
+      {% endif %}
+      {% if section.settings.subheading_richtext != blank %}
+      <div class="h5">{{ section.settings.subheading_richtext }}</div>
+      {% endif %}
+      {% if section.settings.link != blank %}<a href="{{section.settings.link}}" class="btn">{{ section.settings.button | escape }}</a>{% endif %}
+    </div>
+  </div>
+  {% if section.settings.image_enabled %}
+    {% if section.settings.image == blank %}
+  <div class="grid__item large--one-half medium-down--one-whole right-image placeholder-features"></div>
+  {% else %}
+  <div class="grid__item large--one-half medium-down--one-whole right-image {{section.settings.feature_image_position}} lazyload lazypreload" 
+      data-bgset="{% include 'bgset', image: section.settings.image %}"
+      data-sizes="auto"
+      data-parent-fit="cover" 
+      style="background-image: url({{ section.settings.image | img_url: "300x300"}});" ></div>
+  {% endif %}
+  {% endif %}
+  
+  {% endif %}
+</div>
+
+{% schema %}
+{
+"name": "Image with text",
+"name": "Image",
+"settings": [
+{
+"type": "checkbox",
+"id": "image_enabled",
+"label": "Enable image",
+"default": true
+},
+{
+"type":      "radio",
+"id":        "id",
+"label":     "Text",
+"options": [
+{ "value": "left", "label": "Image on left" },
+{ "value": "right", "label": "Image on right" }
+],
+"default":   "right"
+},
+{
+"type": "image_picker",
+"id": "image",
+"label": "Image",
+"info": "800 x 600px .png recommended"
+},
+{
+"type": "select",
+"id": "feature_image_position",
+"label": "Image position",
+"default": "feature-top",
+"options": [
+{
+"value": "feature-top",
+"label": "Top"
+},
+{
+"value": "feature-middle",
+"label": "Middle"
+},
+{
+"value": "feature-bottom",
+"label": "Bottom"
+}
+]
+},
+{
+"type": "text",
+"id": "title",
+"label": "Heading",
+"default": "Image with text"
+},
+{
+"type": "richtext",
+"id": "subheading_richtext",
+"label": "Subtitle",
+"default": "<p>Your feature subtitle</p>"
+},
+{
+"type": "text",
+"id": "button",
+"label": "Button label"
+},
+{
+"type": "url",
+"id": "link",
+"label": "Button link"
+}
+],
+  "presets": [
+  {
+  "name": "Image with text",
+  "category": "Image"
+  }
+  ]
+  }
+{% endschema %}

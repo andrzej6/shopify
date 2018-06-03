@@ -1,0 +1,35 @@
+<!-- /snippets/collection-sorting.liquid -->
+<div class="form-horizontal  {% if collection.all_tags.size > 0 %}tag-sort-exists{%endif%}">
+  <div class="sort-flex">
+    <label for="SortBy">{{ 'collections.sorting.title' | t }}</label>
+    <select name="SortBy" id="SortBy">
+      <option value="manual">{{ 'collections.sorting.featured' | t }}</option>
+      <option value="best-selling">{{ 'collections.sorting.best_selling' | t }}</option>
+      <option value="title-ascending">{{ 'collections.sorting.az' | t }}</option>
+      <option value="title-descending">{{ 'collections.sorting.za' | t }}</option>
+      <option value="price-ascending">{{ 'collections.sorting.price_ascending' | t }}</option>
+      <option value="price-descending">{{ 'collections.sorting.price_descending' | t }}</option>
+      <option value="created-descending">{{ 'collections.sorting.date_descending' | t }}</option>
+      <option value="created-ascending">{{ 'collections.sorting.date_ascending' | t }}</option>
+    </select>
+  </div>
+</div>
+<input id="default-sort-by" type="hidden" value="{{ collection.sort_by | default: collection.default_sort_by }}">
+
+<div class="form-horizontal">
+  {% if collection.all_tags.size > 0 %}
+  <div class="clearfix filter">
+    <label for="SortBy">{{ 'collections.sorting.title' | t }}</label>
+    <select class="coll-filter" data-handle="{{collection.handle}}">
+      <option value="">All</option>
+      {% for tag in collection.all_tags %}
+      {% if current_tags contains tag %}
+      <option value="{{ tag | handle }}" selected>{{ tag }}</option>
+      {% else %}
+      <option value="{{ tag | handle }}">{{ tag }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+  {% endif %}
+</div>

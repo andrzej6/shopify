@@ -1,0 +1,357 @@
+<!-- /sections/cart-template.liquid -->
+{% comment %}
+
+For info on test orders:
+- General http://docs.shopify.com/manual/your-store/orders/test-orders
+- Shopify Payments - http://docs.shopify.com/manual/more/shopify-payments/testing-shopify-payments
+{% endcomment %}
+
+{% comment%}
+If we have products in the cart
+{%endcomment%}
+<div data-section-id="{{section.id}}" data-section-type="cart">
+  {% if cart.item_count > 0 %}
+
+  {% comment%}
+  Mobile sticky Header Buttons. Please wash your hands afterwards
+  {%endcomment%}
+  <div class="cart-top-buttons large--hide medium-down--show grid--full">
+    <div class="one-half top-cart-total">
+      <span class="btn js-cart-btn-subtotal">{{ 'cart.label.total' | t }}: {{ cart.total_price | money }}</span>
+    </div>
+    <div class="one-half top-cart-checkout">
+      <button type="submit" name="add" id="AddToCart" class="btn">
+        <span id="AddToCartText">{{ 'cart.general.mobileCheckout' | t }}</span>
+      </button>
+    </div>
+  </div>
+
+ <form id="main-checkout-form" action="/cart" method="post" novalidate class="cart table-wrap">
+  <div class="grid--full cart-header medium-down--hide js-cart-hide-on-empty">
+    <div class="grid__item large--one-half medium--one-whole cart-header-title">
+      <h1>{{ 'cart.general.title' | t }}</h1>
+    </div>
+    <div class="grid__item large--one-half medium-down--hide cart-header-buttons">
+      <div class="btn--tertiary cart-continue-button"><a href="collections/all"></a>{{ 'cart.general.continue_browsing_html' | t }}</div>
+      <button type="submit" name="checkout" class="btn cart-submit-button">{{ 'cart.general.checkout' | t }}</button> 
+      <div class="mobile-price-centered">
+        <span class="h4 cart__subtotal-title">{{ 'cart.general.subtotal' | t }}</span>
+        <span class="h2 cart__subtotal js-cart-subtotal">{{ cart.total_price | money }}</span>
+      </div>
+    </div>
+  </div>
+
+    {% for item in cart.items %}
+    {% assign hasDiscount = false %}
+    {% if cart.total_discounts > 0 %}
+      {% if item.original_line_price != item_price %}
+        {% assign hasDiscount = true %}
+      {% endif %}
+    {% endif %}
+    <div class="grid--full cart-items js-cart-items-container">
+      <!-- item image -->
+      <div class="grid__item large--one-half medium-down--one-quarter cart-product-image">
+        <a href="{{ item.url | within: collections.all }}" class="cart__image">
+          {% comment %}
+          More image size options at:
+          - http://docs.shopify.com/themes/filters/product-img-url
+          {% endcomment %}
+          {% assign img_url = item  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+          <img class="lazyload lazystretch"
+            src="{{ item | img_url: '300x' }}"
+            data-src="{{ img_url }}"
+            data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+            data-aspectratio="{{ item.aspect_ratio }}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            alt="{{ item.title | escape }}">
+
+        </a>
+      </div>
+      <!-- item information -->
+      <div class="grid__item large--one-half medium-down--one-half">
+        <div class="grid-full cart-product-info-wrapper js-cart-item-info-container" data-price="{{item.price}}" data-id="{{ item.id }}">
+          <div class="large--grid__item large--one-whole medium-down--one-whole cart-quantity-field mobile-product-wrapper">
+            <div class="grid-full">
+              <!-- item title / description / vendor -->
+              <div class="grid__item large--one-half cart-product-info-wrapper ">
+                <a href="{{ item.url }}" class="h4 cart-product-title">
+                  {{ item.product.title | truncatewords:20}}
+                </a>
+                   <div class="grid__item large--one-quarter cart-price-wrapper medium-down--show large--hide">
+                <td data-label="{{ 'cart.label.total' | t }}" class="text-right">
+                  <div class="cart-price-wrapper">
+                    {% if hasDiscount %}
+                    <span class="cart-item__original-price js-cart-item-orig-price"><s>{{ item.original_line_price | money }}</s></span>
+                    {% endif %}
+
+                    <h3 class="cart-product-price-title medium-down--hide">{{ 'cart.label.price' | t }}</h3>
+                    <span class="h3 cart-product-price">
+                      <span id="item-price" class="js-cart-item-price">
+                        {{ item.line_price | money }}
+                      </span>
+                    </span>
+                    {% for discount in item.discounts %}
+                    <span class="cart-item__discount">{{ discount.title }}</span>
+                    {% endfor %}
+                  </div>
+                </td>
+              </div>
+                {% unless item.variant.title contains 'Default' %}
+                <p><small>{{ 'cart.label.option' | t }}: {{ item.variant.title }}</small></p>
+                {% endunless %}
+                {% if section.settings.cart_vendor_enable %}
+                <h4 itemprop="brand" class="product-single__vendor medium-down--hide">{{ item.vendor }}</h4>
+                {% endif %}
+
+                {% comment %}
+                Optional, loop through custom product line items if available
+                For more info on line item properties, visit:
+                - http://docs.shopify.com/support/your-store/products/how-do-I-collect-additional-information-on-the-product-page-Like-for-a-monogram-engraving-or-customization
+                {% endcomment %}
+                {% assign property_size = item.properties | size %}
+                {% if property_size > 0 %}
+                {% for p in item.properties %}
+                {% unless p.last == blank %}
+                {{ p.first }}:
+                {% comment %}
+                Check if there was an uploaded file associated
+                {% endcomment %}
+                {% if p.last contains '/uploads/' %}
+                <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a> 
+                {% else %}
+                {{ p.last }}
+                {% endif %}
+                <br>
+                {% endunless %}
+                {% endfor %}
+                {% endif %}
+              </div>
+
+              <!-- item quantity -->
+              <div class="grid__item large--one-quarter cart-quantity-wrapper">
+                <td data-label="{{ 'cart.label.quantity' | t }}">
+                  <h3 class="cart-quantity-title">{{ 'cart.label.quantity' | t }}</h3>
+                  {% include 'variant-qty-controls', quantity:item.quantity %}
+                </td>
+              </div>
+
+              <!-- item price-->
+              <div class="grid__item large--one-quarter cart-price-wrapper medium-down--hide">
+                <td data-label="{{ 'cart.label.total' | t }}" class="text-right">
+                  <div class="cart-price-wrapper">
+                    {% if hasDiscount %}
+                    <span class="cart-item__original-price js-cart-item-orig-price"><s>{{ item.original_line_price | money }}</s></span>
+                    {% endif %}
+
+                    <h3 class="cart-product-price-title medium-down--hide">{{ 'cart.label.price' | t }}</h3>
+                    <span class="h3 cart-product-price">
+                      <span id="item-price" class="js-cart-item-price">
+                        {{ item.line_price | money }}
+                      </span>
+                    </span>
+                    {% for discount in item.discounts %}
+                    <span class="cart-item__discount">{{ discount.title }}</span>
+                    {% endfor %}
+                  </div>
+                </td>
+              </div>
+            </div>
+
+            {%if section.settings.cart-review-desc == 'review'%}
+            <div class="large--grid__item large--one-whole medium-down--one-whole cart-review-description">
+              <div id="shopify-product-reviews" data-id="{{item.product.id}}">{{ item.metafields.spr.reviews | truncatewords:50 }}</div>
+            </div>
+            {%elsif section.settings.cart-review-desc == 'desc' %}
+            <div class="large--grid__item large--one-whole medium-down--one-whole cart-product-description">
+              <p>{{ item.product.description | strip_html | truncatewords:30 }}</p>
+            </div>
+            {%endif%}
+
+            <hr class="cart-remove-hr">
+
+            <!-- item remove from cart -->
+            <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="cart__remove medium-down--hide">
+              <small>{{ 'cart.general.remove' | t }}</small>
+            </a>
+          </div>
+
+        </div>
+      </div>
+      <div class="grid__item large--hide medium-down--one-quarter mobile-cart-remove">
+       <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="cart__remove">
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 16 15">
+  <path fill="currentColor" fill-rule="evenodd" d="M15 1.218L13.78 0 7.5 6.282 1.22 0 0 1.218 6.282 7.5 0 13.782 1.22 15 7.5 8.718 13.78 15 15 13.782 8.718 7.5"></path>
+</svg>
+            </a>
+      </div>
+
+    </div>
+    {% endfor %}
+
+
+    <div class="grid--full grid__row cart-purchase-wrapper {%unless section.settings.title != '' or section.settings.cart-ad-description_richtext != ''  or section.settings.cart_notes_enable or section.settings.cart-purchase-number != '' or section.settings.cart-purchase-email != ''%} medium-down--hide{%endunless%} js-cart-hide-on-empty">
+      {% if section.settings.title != '' or section.settings.cart-ad-description_richtext != ''%}
+      <div class="large--grid__item large--one-half medium--one-whole cart-store-promotion" {%if section.settings.cart_ad_colors%}style="background-color:{{section.settings.cart_ad_background}}; color:{{section.settings.cart_ad_text_color}}"{%endif%}>
+        <div class="cart-ad-wrapper">
+          <h2>{{ section.settings.title | truncatewords:10}}</h2>
+
+          <h3>{{ section.settings.cart-ad-description_richtext | truncatewords: 40}}</h3>
+        </div>
+      </div>
+      {%endif%}
+      <div class="large--grid__item {%if section.settings.title != '' or section.settings.cart-ad-description_richtext != '' %}large--one-half{%else%} large--one-whole {%endif%}  {%unless section.settings.title != '' or section.settings.cart-ad-description_richtext != ''  or section.settings.cart_notes_enable or section.settings.cart-purchase-number != '' or section.settings.cart-purchase-email != ''%} medium-down--hide{%endunless%} cart-checkout-field">
+        <div>
+          {% if section.settings.cart_notes_enable %}
+          <h3 class="cart-purchase-header medium-down--hide large--show">{{ section.settings.cart-purchase-header |  truncate: 100 }}</h3>
+          <h2 class="cart-purchase-header large--hide medium-down--show">{{ section.settings.cart-purchase-header |  truncate: 100  }}</h2>
+          {%endif%}
+          {%if section.settings.cart-purchase-number != '' or section.settings.cart-purchase-email != ''%}
+          <div class="cart-contact-wrapper">
+            {%if section.settings.cart-purchase-number != ''%} <h3 class="cart-contact-number">{{ section.settings.cart-purchase-number | escape | truncate:30 }}</h3> {%endif%}
+            {%if section.settings.cart-purchase-email != ''%} <h3 class="cart-contact-email">{{ section.settings.cart-purchase-email  | escape | truncate:30}}</h3>{%endif%}
+          </div>
+          {%endif%}
+
+          {% if section.settings.cart_notes_enable %}
+          <div class="large--grid__item large--one-whole small--one-whole cart-note-wrapper">
+
+            <textarea name="note" rows="6" class="input-full" id="CartSpecialInstructions" placeholder="{{ 'cart.general.note' | t }}"></textarea>
+          </div>
+          {% endif %}
+
+          <div class="large--grid__item large--one-whole medium-down--hide cart-purchase-buttons">
+            <div class="btn--tertiary medium-down--one-whole cart-continue-button {% if section.settings.title != '' or section.settings.cart-ad-description_richtext != '' %}cart-enabled{%else%}cart-disabled{%endif%}"><a href="collections/all"></a>{{ 'cart.general.continue_browsing_html' | t }}</div>
+            <form action="/cart" method="post" novalidate class="cart table-wrap">
+              {% if cart.total_discounts > 0 %}
+              {% assign savings = cart.total_discounts | money %}
+              <p>
+                <span class="cart-subtotal__savings"><em>{{ 'cart.general.savings_html' | t: price: savings }}</em></span>
+              </p>
+              {% endif %}
+              <input type="submit" name="checkout" id="mobile-cart-submit-button" class="btn cart-submit-button medium-down--one-whole {% if section.settings.title != '' or section.settings.cart-ad-description_richtext != '' %}cart-enabled{%else%}cart-disabled{%endif%}" value="{{ 'cart.general.checkout' | t }}">
+            </form>
+            <div class="bottom-cart-total">
+              <span class="h4 cart__subtotal-title">{{ 'cart.general.subtotal' | t }}</span>
+              <span class="h2 cart__subtotal js-cart-subtotal">{{ cart.total_price | money }}</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </form>
+  <div class="cart-items-empty js-cart-show-on-empty large--hide medium-down--show">
+
+    <p><a href="collections/all">{{ 'cart.general.continue_browsing_html' | t }}</a></p>
+  </div>
+  {% else %}
+
+  {% comment %}
+  The cart is empty
+  {% endcomment %}
+  {% endif %}
+  <div class="cart-items-empty js-cart-show-on-empty" {% if cart.item_count > 0%}style="display:none"{%endif%}>
+    <h2>{{ 'cart.general.title' | t }}</h2>
+    <p>{{ 'cart.general.empty' | t }}</p>
+    <p><a href="collections/all">{{ 'cart.general.continue_browsing_html' | t }}</a></p>
+  </div>
+</div>
+
+
+{% schema %}
+{
+"name": "Cart page",
+"settings": [
+{
+"type": "select",
+"id": "cart-review-desc",
+"label": "Select additional info to display for each product",
+"info": "Install the free Shopify [Product Reviews](https:\/\/apps.shopify.com\/product-reviews) app to add product reviews.",
+"options": [
+{
+"value": "none",
+"label": "None"
+},
+{
+"value": "desc",
+"label": "Description"
+},
+{
+"value": "review",
+"label": "Review"
+}
+]
+},
+{
+"type": "checkbox",
+"id": "cart_notes_enable",
+"label": "Enable cart notes",
+"default": true
+},
+{
+"type": "checkbox",
+"id": "cart_vendor_enable",
+"label": "Show product vendor"
+},
+{
+"type": "header",
+"content": "Custom cart advertisement"
+},
+{
+"type": "checkbox",
+"id": "cart_ad_colors",
+"label": "Enable custom colors"
+},
+{
+"type": "color",
+"id": "cart_ad_background",
+"label": "Background color",
+"default": "#39b54a"
+},
+{
+"type": "color",
+"id": "cart_ad_text_color",
+"label": "Text color",
+"default": "#fff"
+},
+{
+"type": "text",
+"id": "title",
+"label": "Title",
+"default": "Share an offer with your customers",
+"info": "Limited to 10 words."
+},
+{
+"type": "richtext",
+"id": "cart-ad-description_richtext",
+"label": "Description",
+"default": "<p>And let people know why they should take advantage of your promotional offer.</p>",
+"info": "Limited to 40 words."
+},
+{
+"type": "header",
+"content": "Cart purchase information"
+},
+{
+"type": "richtext",
+"id": "cart-purchase-header",
+"label": "Title",
+"default": "<p>Have a question about your order before you complete checkout?</p>",
+"info": "Limited to 100 characters"
+},
+{
+"type": "text",
+"id": "cart-purchase-number",
+"label": "Contact number",
+"default": "(816)-555-5555"
+},
+{
+"type": "text",
+"id": "cart-purchase-email",
+"label": "Contact email",
+"default": "sales@mdliving.com"
+}
+]
+}
+{% endschema %}

@@ -1,0 +1,118 @@
+<!-- /templates/page.list-collections2-products.liquid -->
+{% capture uses_minimal_framework %}{% include 'product-loop' %}{% endcapture %}
+{% assign grid_item_width = 'large--one-third medium--one-whole small--one-whole' %}
+{% assign image_size = 'large' %}
+{% if linklists[page.handle].links.size > 0 %}
+{% assign number_of_links = 0 %}
+{% for link in linklists[page.handle].links  %}
+{% if link.type == 'collection_link' %}
+{% assign rect = true%}
+{% comment %}
+If we have a collection link.
+{% endcomment %}
+{% assign collection = link.object %}
+{% assign number_of_links = number_of_links | plus: 1 %}
+<style>
+  .collection-product-img,
+  .collection-product-featured-img{
+    object-fit:{{section.settings.collection_cover}};
+  }
+
+</style>
+
+<div class="grid--full collections-height page-list-collection parent-grid-wrapper">
+  <div class="grid__item product-grid-item {{ grid_item_width }} text-center collection-image-wrapper collection-grid-height">
+    <div class="content-class">
+      <div class="list-collections-content card-shadow text-center list-collections-image lazyload" 
+          data-bgset="{% include 'bgset', image: collection.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover" 
+          style="background-image: url(https:{{ collection.image | img_url: '300x' }});">
+        <div class="collection-color-overlay"></div>
+        <div class="section-header collection-overlay">
+          <h2>{{ collection.title | truncatewords:20}}</h2>
+          <a href="{{ collection.url }}"> <button class="btn">{{'collections.general.view_collection' | t}}</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid__item large--two-thirds medium-down--one-whole collection-grid-height collection-products-container">
+    <div class="grid-full collection-product-wrapper">
+      {% if collection.products_count > 0 %}
+      <div class="large--show medium-down--hide full-height">
+        {% for product in collection.products limit:2 %}
+        <div class="product-block full-height two-large-products">
+          {% include 'collection-grid-item' with "large--one-half full-height" %}
+        </div>
+        <!-- END DESK-->
+        {% endfor %}
+      </div>
+      <div class="large--hide medium-down--show">
+        {% for product in collection.products limit:2 %}
+        <div class="product-block two-large-products">
+          {% include 'collection-grid-item' with "large--one-half" %}
+        </div>
+        <!-- END MOBILE-->
+        {% endfor %}
+      </div>
+      {%else%}
+      <div class="grid__item large--one-whole text-center collection-item-empty">
+        <div class="jim-test content-class card-shadow" style="position: relative; ">
+          <h2 class="collection-link-last">Empty <br> Collection</h2>
+        </div>
+      </div>
+      {%endif%}
+      {%endif%}
+    </div>
+  </div>
+
+  <!-- end item -->
+  {% endfor %}
+
+  {% if number_of_links == 0 %}
+  <div class="grid__item large--one-whole text-center collection-item-empty">
+    <div class="jim-test content-class" style="position: relative; ">
+      <h2 class="collection-link-last"> There are no links of type <i>Collection</i> in your <b>{{ page.title }}</b> link list.
+        Go ahead and <a href="/admin/link_lists/{{ linklists[page.handle].id }}" target="_blank">edit your link list</a> to use links that point to collections.</h2>
+    </div>
+  </div>
+
+  {% endif %}
+
+  {% else %}
+  <div class="grid">
+    <div class="grid__item grid-item rte text-center">
+      <p>
+        You do not have a link list with a handle set to <kbd>{{ page.handle }}</kbd>, or you do and it's empty.
+        Go ahead and create a link list called <b>{{ page.title }}</b> on your <a href="/admin/links" target="_blank">Navigation page</a> and populate that link list with links that point to collections, to see collections listed here.
+        Make sure the link list also has a handle set to <kbd>{{ page.handle }}</kbd>.
+      </p>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+{% schema %}
+{
+"name": "2 Product Template",
+"settings": [
+{
+"type": "select",
+"id": "collection_cover",
+"label": "Image Scaling",
+"default": "cover",
+"options": [
+{
+"value": "cover",
+"label": "Cover"
+},
+{
+"value": "contain",
+"label": "Contain"
+}
+]
+}
+]
+}
+{% endschema %}

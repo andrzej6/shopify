@@ -1,0 +1,364 @@
+<!-- /sections/home-featured-products.liquid -->
+<div class="grid--full home-featured-products {% if section.settings.block-width == "50%" %}productflex{% endif %}" itemscope itemtype="http://schema.org/Product" id="ProductSection-{{ section.id }}" data-section-id="{{ section.id }}" data-section-type="product" data-enable-history-state="true">
+  <meta itemprop="name" content="{{ product.title }}">
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product.featured_image.src | img_url: '800x' }}">
+  {%- assign block_counter = 0 -%}
+  <!-- Featured Product -->
+  {% for block in section.blocks %}
+  {%- assign block_counter = block_counter | plus:1 -%}
+  {% case section.settings.block-width %}
+  {% when '50%' %}
+  {%- assign block_width = 'large--one-half half-size' -%}
+  {%- assign extra_padding = '0 0 0 15px' -%}
+  {%- assign extra_padding_block2 = '0 15px 0 0' -%}
+  <style>
+    @media (min-width:769px) and (max-width:1180px){
+      .block-padding-{{section.id}} {
+        padding: 0 0 0 15px;
+      }
+      .block2-padding-{{section.id}} {
+        padding: 0 0 0 0;
+      }
+    }
+  </style>
+  {% when '100%' %}
+  {%- assign block_width = 'large--one-whole medium--one-whole small--one-whole full-size' -%}
+  {%- assign extra_padding = '30px 0px 0px 0px' -%}
+  {%- assign extra_padding_block2 = '0px 0px 0px 0px' -%}
+  <style>
+    @media (min-width:769px) and (max-width:1180px){
+      .block-padding-{{section.id}} {
+        padding: 15px 0 0 0px;
+      }
+      .block2-padding-{{section.id}} {
+        padding: 0 0 0 0;
+      }
+    }
+  </style>
+  {% endcase %}
+
+  {% case block.type %}
+  {% when 'text' %}
+  <!-- Desktop Featured Promotion -->
+  <div class="grid__item medium-down--one-whole {{ block_width }} small--one-whole featured-productsh {% if block_counter == 1 %} single-block-{{ section.id }} block2-padding-{{ section.id }} {% elsif forloop.last == true %} block-padding-{{ section.id }} {% else %} block2-padding-{{ section.id }} {% endif %} {{ block.shopify_attributes }}desktop-featured-text">
+    <div class="content-class homepage-promotion text-center margin-B-M cardpadding card-shadow">
+      <div class="rte feature-content">
+        {% if block.settings.title != blank %}
+        <h1 class="secondary">{{ block.settings.title | escape }}</h1>
+        {% endif %}
+        {% if block.settings.featured-promotion-subtitle_richtext != blank %}
+        <div class="h3 secondary">{{ block.settings.featured-promotion-subtitle_richtext  }}</div>
+        {% endif %}
+        {% if block.settings.featured-promotion-link != blank %}
+        <a class="btn--secondary" href="{{ block.settings.featured-promotion-link }}">{{ block.settings.featured-promotion-button | escape }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% when 'product' %}
+   <style>
+    {%if block.settings.enable_payment_button%}
+    .smart-wrapper{
+      padding:1px;
+      margin:0 auto;  
+    }
+    .smart-block-{{block.id}} .shopify-payment-button{
+      max-width:300px;
+      width:100% !important;
+      margin: 0 auto;
+    }
+    .smart-block-{{block.id}} .shopify-payment-button__button{
+      width:100% !important;
+    }
+    .btn-{{block.id}} span{
+      line-height:1.5;
+    }
+    .btn-{{block.id}},
+    .btn-{{block.id}} span{
+      height:44px;
+      width:100%;
+      max-width:300px;
+      padding:0;
+    }
+    .btn-{{block.id}}{
+      background-color:{{settings.color_secondary}};
+      color:{{settings.btn_secondary_text_color}};
+      border:1px solid {{settings.btn_secondary_text_color}};
+    }
+    button.btn-{{block.id}}:disabled{
+      border:initial;
+
+    }
+    {%endif%}
+  </style>
+  {%- assign product = all_products[block.settings.home-featured] -%}
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  <div class="grid__item {{ block_width }} medium--one-whole small--one-whole featured-productsh {% if section.settings.block-width == '100%' %} full-width-product {% endif %} featured-product-{{ forloop.index }} {% if block_counter == 1 %}single-block-{{ section.id }}  block2-padding-{{ section.id }} {%elsif forloop.last == true %} block-padding-{{ section.id }} {% else %} block2-padding-{{ section.id }} {% endif %}desktop-featured-product">
+    <div class="content-class second-slider featured-product-container flexblock-{{ section.id }} margin-B-M cardpadding card-shadow" data-bjorn-id="{{ section.id }}">
+      <div class="grid__item large--one-half medium--one-whole small--one-whole text-center ">
+        {% if product.empty? %}
+        {%- assign section_onboarding = true -%}
+        {% endif %}
+        {% unless section_onboarding %}
+        <a href="{{ all_products[block.settings.home-featured].url }}"><h2>{{ all_products[block.settings.home-featured].title | escape }}</h2></a>
+        {% if block.settings.product-description %}
+        {% if product.description != '' %}
+        {%- assign prodDesc = product.description -%}
+        {% if prodDesc.size > 200 %}
+        {% if section.settings.block-width != '100%' %}
+        {%- assign flexsignal = 'column-reverse' -%}
+        {% else %}
+        {%- assign flexsignal = 'row' -%}
+        {% endif %}
+        {% else %}
+        {%- assign flexsignal = 'row' -%}
+        {% endif %}
+        {% endif %}
+
+        <h3 class="featured-product-desc">{{ product.description }}</h3>
+        {%endif%}
+        <span id="ProductPrice" class="h2 js-prod-price" itemprop="price" content="{{ current_variant.price | divided_by: 100 }}">
+          {{ current_variant.price | money_without_trailing_zeros }}
+        </span>
+        {% else %}
+        <h2>Placeholder Product</h2>
+        {% if block.settings.product-description %}
+        <h3 class="featured-product-desc">This is your product's description, which is pulled automatically from the product.</h3>
+        {% endif %}
+        <span id="ProductPrice-{{ section.id }}" class="h2 js-prod-price">
+          $150
+        </span>
+        {% endunless %}
+        <!-- Start Product Form -->
+        {% include 'home-featured-products-form' %}
+        <!-- End Product Form -->
+      </div>
+
+      <div data-section-id="{{ section.id }}" class="grid__item large--one-half medium--one-whole small--one-whole grid-product-container product-template__container {% if section_onboarding %}promotion-placeholder-image{% endif %}">
+        <div class="grid__item  text-center {{ product_image_width }} grid-product-container product-image">
+          {% unless section_onboarding %}
+          {%- assign featured_image = current_variant.featured_image | default: product.featured_image -%} 
+          {%- assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.'  -%}
+
+          {% if product.images.size > 1 %}
+          <div class="product__slides product-single__photos product-featured-image-no-zoom js-slides-container" id="ProductPhoto-{{ section.id }}">
+            <div class="product__photo" data-thumb="{{featured_image | img_url: '1024x1024' }}">
+              <img class="lazyload ProductImg-{{ section.id }}"
+                src="{{ featured_image| img_url: '300x300' }}"
+                data-src="{{img_url}}"
+                data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                data-aspectratio="{{ featured_image.aspect_ratio }}"
+                data-mfp-src="{{ featured_image | img_url: '1024x1024'  }}"
+                data-mfp-srcset="{%include 'bgsetzoom', image: featured_image %}"
+                data-sizes="auto"
+                data-parent-fit="cover"
+                data-image-id="{{ featured_image.id }}">
+            </div>
+            {% for image in product.images %}
+            {% unless image contains featured_image %}
+           {%- assign img_url = image.src | img_url: '1x1' | replace: '_1x1.', '_{width}x.'  -%}
+            <div class="product__photo{% unless forloop.first == true %} product__photo--additional{% endunless %}"  data-thumb="{{ image.src | img_url: 'small_cropped' }}">
+              <img class="lazyload ProductImg-{{ section.id }}"
+                    src="{{ image.src | img_url:'300x300' }}"
+                    data-src="{{img_url}}"
+                    data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                    data-aspectratio="{{ image.src.aspect_ratio }}"
+                    data-mfp-src="{{ image.src | img_url: '1024x1024'}}"
+                    data-mfp-srcset="{%include 'bgsetzoom', image: image %}"
+                    data-sizes="auto"
+                    data-parent-fit="cover"
+                    data-image-id="{{ image.id }}">
+            </div>
+            {% endunless %}
+            {% endfor %}
+          </div>
+          {% else %}     
+
+          {%- assign featured_image = current_variant.featured_image |  default: product.featured_image  -%}
+          {%- assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.'  -%}   
+          <div class="product__photo product-single__photos {% if section.settings.enable_zoom %}product-featured-image{% else %}product-featured-image-no-zoom{% endif %}">
+            <img class="lazyload featured-product-single-image"
+                          src="{{ featured_image | img_url: '300x300'}}"
+                          data-src="{{ img_url }}"
+                          data-widths="[320, 540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                          data-aspectratio="{{ featured_image.aspect_ratio }}"
+                          data-mfp-src="{{ featured_image | img_url: '1024x1024'}}"
+                          data-mfp-srcset="{%include 'bgsetzoom', image: featured_image %}"
+                          data-sizes="auto"
+                          data-parent-fit="cover"
+                          data-image-id="{{ featured_image.id }}">
+
+          </div>
+          {% endif %}
+          {% else %}
+          <img src="{{ 'temp-product.jpg' | asset_url }}" class="product-single__photos">
+          {% endunless %}
+          <div class="sold-out collection-product-sale-badge js-prod-show-sale js-prod-badge" {% if sold_out or on_sale == false %}style="display:none"{% endif %}>
+            {% include 'tbm-icons', icon: 'sale' %}
+          </div>      
+          <div class="sold-out collection-product-soldout-badge js-prod-show-soldout js-prod-badge" {% unless sold_out %}style="display:none{% endunless %}">
+            {% include 'tbm-icons', icon: 'soldout'%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endcase %}
+  {% endfor %}
+</div>
+
+{% if block_counter != 2 %}
+{%- assign extra_padding = '30px 0px 0px 0px' -%}
+{%- assign extra_padding_block2 = '0px 0px 0px 0px' -%}
+<style>
+  .single-block-{{section.id}}{
+    width:100%;
+  }
+  @media (min-width:769px) and (max-width:1180px){
+    .block-padding-{{section.id}} {
+      padding: 15px 0 0 0px;
+    }
+    .block2-padding-{{section.id}} {
+      padding: 0 0 0 0;
+    }
+  }
+  .single-block-{{section.id}} .featured-product-container  .grid__item.large--one-third{
+    height:80%;
+  }
+</style>
+{%else%}
+
+<style>
+  @media screen and (min-width:769px){
+    .single-block-{{section.id}}{
+      width:{{section.settings.block-width}};
+    }
+  }
+</style>
+
+{%endif%}
+<style>
+  .single-block-{{section.id}}.one-whole .featured-product-container  .grid__item.large--one-third{
+    height:80%;
+  }
+  @media screen and (min-width:901px){
+    .flexblock-{{ section.id }}{
+      flex-direction: {{ flexsignal }};
+    }
+  }
+  @media screen and (min-width:1181px){
+    .block-padding-{{section.id}} {
+      padding: {{ extra_padding }};
+    }
+    .block2-padding-{{section.id}} {
+      padding: {{ extra_padding_block2 }};
+    }
+  }
+
+</style>
+{% unless product.empty? %}
+<script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+</script>
+{% endunless %}
+
+{% schema %}
+{
+"name": "Product with promotion",
+"class": "section-margin-block section-featured-products",
+"max_blocks": 2,
+
+"settings": [
+
+{
+"type": "select",
+"id": "block-width",
+"label": "Container width",
+"default": "50%",
+"options": [
+{
+"value": "50%",
+"label": "50%"
+},
+{
+"value": "100%",
+"label": "100%"
+}
+]
+}
+
+
+],
+"blocks": [
+{
+"type": "product",
+"name": "Product",
+"limit": 2,
+"settings": [
+{
+"type": "product",
+"id": "home-featured",
+"label": "Feature product"
+},
+{
+"type": "checkbox",
+"id": "product-description",
+"label": "Show product description"
+},
+{
+"type": "checkbox",
+"id": "enable_payment_button",
+"label": "Show dynamic checkout button",
+"info": "Lets customers check out directly using a familiar payment method. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"default": false
+}
+]
+},
+{
+"type": "text",
+"name": "Promotion",
+"limit": 2,
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Title",
+"default": "Highlight product promotions"
+},
+{
+"type": "richtext",
+"id": "featured-promotion-subtitle_richtext",
+"label": "Subtitle",
+"default": "<p>Present shoppers with <b>promotions</b> that are directly relevant to <b>featured products.</b></p>"
+},
+{
+"type": "text",
+"id": "featured-promotion-button",
+"label": "Button label",
+"default": "Button text"
+},
+{
+"type": "url",
+"id": "featured-promotion-link",
+"label": "Button link"
+}
+]
+}
+],
+"presets": [
+{
+"name": "Product with promotion",
+"category": "Promotional",
+"blocks": [
+{
+"type": "product"
+},
+{
+"type": "text"
+}
+]
+}]
+}
+{% endschema %}

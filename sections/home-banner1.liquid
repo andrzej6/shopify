@@ -1,0 +1,130 @@
+{% assign _section = section.settings %}
+{%- assign altClass = '' -%}
+
+{%- if _section.banner_text_position == 'below' -%}
+  {%- assign altClass = 'section-parallax--alt' -%}
+{%- else -%}
+  {%- assign altClass = '' -%}
+{%- endif -%}
+
+<section class="section-parallax {{ altClass }}" data-section-id="{{section.id}}" data-section-type="banner">
+    <div class="section__image-outer">
+        <div class="section__image lazyload" 
+    data-bgset="{% include 'bgset', image: _section.featured-image-banner %}"
+    data-sizes="auto"
+    data-parent-fit="cover"
+    style="background-image: url({% if _section.featured-image-banner != blank %} {{ _section.featured-image-banner | img_url: '300x' }}  {% else %} {{ 'banner-placeholder.png' | asset_url }} {% endif %});">
+    </div><!-- /.section__image -->
+    </div><!-- /.section__image-outer -->
+
+    <div class="section__inner {% if altClass != ''%}card-shadow{%endif%}">
+    {% if _section.title != blank %}
+        <div class="section__body">
+            <div class="section__content {% if altClass != ''%}below-positioning{%endif%}">
+                <h2>{{_section.title | escape | truncate: 50 }}</h2>
+            
+                <div class="section__content-inner">
+                    {{ _section.banner_one_subheading_richtext | truncate: 200 }}
+                </div><!-- /.section__content-inner -->
+            
+                {% if _section.banner_option == "search" %}
+                    <div class="section__bar">
+                        {% include 'search-bar' %}
+
+                        <button class="btn--secondary open-search-button secondary js-mobile-search-open" id="mobile-search-button">Open Search</button>
+                    </div><!-- /.section__bar -->
+                {% endif %}
+
+                {% if _section.banner_option == "cta" %}
+                    {% if section.settings.button_link != blank and section.settings.button_text != blank %}
+                        <div class="section__actions">
+                            <a href="{{ _section.button_link }}" class="btn">{{  _section.button_text }}</a>
+
+                            <a href="{{ _section.button_link }}" class="btn--secondary">{{  _section.button_text }}</a>
+                        </div><!-- /.section__actions -->
+                    {% endif %}
+                {% endif %}
+            </div><!-- /.section__content -->
+        </div><!-- /.section__body -->
+        {% endif %}
+    </div><!-- /.section__inner -->
+</section><!-- /.section-parallax -->
+
+
+{% schema %}
+    {
+        "name": "Banner with CTA or search",
+        "class": "section-margin home-banner-cta",
+        "settings": [
+            {
+                "type": "image_picker",
+                "id": "featured-image-banner",
+                "label": "Image",
+                "info": "1500 x 1500px .png recommended"
+            },
+            {
+                "type": "text",
+                "id": "title",
+                "default": "Parallax image with search or call to action",
+                "label": "Title",
+                "info": "Limited to 50 characters"
+            },
+            {
+                "type": "richtext",
+                "id": "banner_one_subheading_richtext",
+                "default": "<p>Make it easy for visitors to find what they're looking for.</p>",
+                "label": "Subtitle",
+                "info": "Limited to 200 characters"
+            },
+            {
+                "type": "select",
+                "id": "banner_text_position",
+                "options": [
+                {
+                    "value": "top",
+                    "label": "On top of image"
+                },
+                {
+                    "value": "below",
+                    "label": "Below image"
+                }
+            ],
+            "default": "top",
+            "label": "Text position"
+        },
+        {
+            "type": "select",
+            "id": "banner_option",
+            "options": [
+                {
+                    "value": "cta",
+                    "label": "Button"
+                },
+                {
+                    "value": "search",
+                    "label": "Search form"
+                }
+            ],
+        "default": "search",
+        "label": "Banner content"
+        },
+        {
+            "type": "text",
+            "id": "button_text",
+            "label": "Button label",
+            "info": "Changes regular button text, not search button"
+        },
+        {
+            "type": "url",
+            "id": "button_link",
+            "label": "Button link"
+        }
+        ],
+        "presets": [
+            {
+                "name": "Parallax Banner",
+                "category": "Image"
+            }
+        ]
+    }
+{% endschema %}

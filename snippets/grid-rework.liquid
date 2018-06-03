@@ -1,0 +1,99 @@
+<!-- /snippets/product-grid-item.liquid -->
+{% comment %}
+
+This snippet is used to showcase each product during the loop,
+'for product in collection.products' in collection.liquid.
+
+{% endcomment %}
+
+{% comment %}
+Check if the product is on sale and set a variable to be used below.
+{% endcomment %}
+
+{% assign on_sale = false %}
+{% if product.compare_at_price > product.price %}
+{% assign on_sale = true %}
+{% endif %}
+
+{% comment %}
+Check if the product is sold out and set a variable to be used below.
+{% endcomment %}
+
+{% assign sold_out = true %}
+{% if product.available %}
+{% assign sold_out = false %}
+{% endif %}
+
+{% comment %}
+Link to your product with the 'within: collection' filter for the link to be aware of the collection.
+This allows you to create collection-based navigation on the product page.
+
+Results of using 'within: collection':
+- Instead of a URL with /products/product-handle
+you would get /collections/collection-handle/products/product-handle
+
+For more info on navigation within a collection
+- http://docs.shopify.com/support/your-store/collections/how-to-navigate-within-a-collection
+
+{% endcomment %}
+
+<div id="element" class="collection-product{% if sold_out %} collection-product-sold-out{% endif %}">
+  {% if sold_out %}
+  <div class="sold-out">
+    {% include 'tbm-icons', icon: 'soldout'%}
+  </div>
+  {% elsif on_sale %}
+  <div class="collection-product-soldout-badge">
+      {% include 'tbm-icons', icon: 'sale' %}
+  </div>
+  {% endif %}
+  <div class="{% cycle 'collection-box-1', 'collection-box-2' %} card-shadow">
+    <a href="{{ product.url | within: collection }}" class="grid_image_wrapper grid__image {%if sold_out%}collection-product-unavailable {%endif%}">
+                {% assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload grid_image_absolute"
+                      src="{{ product.featured_image | img_url: '300x' }}"
+                      data-parent-fit="cover"
+                      data-src="{{ img_url }}"
+                      data-widths="[360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                      data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+                      data-sizes="auto"
+                      alt="{{ product.featured_image.alt | escape }}" >
+    </a>
+    <div class="product-overlay">
+      <a href="{{ product.url | within: collection }}" class="product-grid-card-wrapper"> </a>
+      <div class="product-grid-card-link">
+      <a href="{{ product.url | within: collection }}">
+         <p class="h2 product-title">
+          {{ product.title | truncatewords:10 }}
+        </p>
+
+         {% if product.price_varies %}
+        {% assign price = product.price | money %}
+        <p class="h2 product-price">{{ 'products.general.from_text_html' | t: price: price }}</p>
+        {% else %}
+        <p class="h2 product-price">{{ product.price | money }}</p>
+        {% endif %}
+      </a>
+       {% if settings.use_swatches %}
+          {% for option in product.options %}
+        
+          {%if option == 'Color'%}
+         {% include 'swatch' with option, total:0, collPage: true%}
+         {%endif%}
+         {%endfor%}
+       {%endif%}
+        {%if settings.enable_quick%}
+          <div data-fancybox data-type="ajax" data-src="{{shop.url}}{{product.url}}" data-filter="#quick" href="javascript:;" class="quick-view">
+          {{'products.general.quick_view' | t }}
+           <div class="quick-star" style="display:none;">
+        <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
+      </div>
+        </div>
+       {%endif%}
+
+      </div>
+    </div>
+
+  </div>
+  <div class="large--hide medium-down--show card-shadow mobile-square-title {% cycle 'mobile-collection-margin-1', 'mobile-collection-margin-2' %}">{% include 'product-price-mobile' %}</div>
+</div>

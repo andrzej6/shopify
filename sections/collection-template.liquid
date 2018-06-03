@@ -1,0 +1,313 @@
+<!-- /sections/collection-template.liquid -->
+<style>
+  .grid__image img {
+   {% if section.settings.collection-product-size %}
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    {% else %}
+    object-fit: contain;
+    height: 100%;
+    {% endif %}
+  }
+  .collection-box-1,
+.collection-box-2{
+ {% if section.settings.collection-product-size %}
+ background-size:cover !important;
+  {% else %}
+  background-size:contain !important;
+  {% endif %}
+}
+  .collection-product  .product-overlay:hover {
+    background-color: rgba(255,255,255,{{section.settings.collection-product-overlay | times: 0.01 }});
+  }
+  {%if section.settings.collection_ad_custom_background%}
+  .collection-page-ad{
+    background-color:{{section.settings.collection-ad-color-background}};
+  }
+  {%endif%}
+   body,.site-header {
+    background-color: {{ section.settings.page-background }}!important;
+  }
+</style>
+
+{% case section.settings.collection-column-width %}
+{% when 5 %}
+{% assign collection_products_per_row = 'one-fifth' %}
+{% when 4 %}
+{% assign collection_products_per_row = 'one-quarter' %}
+{% when 3 %}
+{% assign collection_products_per_row = 'one-third' %}
+{% when 2 %}
+{% assign collection_products_per_row = 'one-half' %}
+{% endcase %}
+
+{% assign collection_background = section.settings.page-background %}
+{% comment %}
+For more information on collection tags:
+- http://docs.shopify.com/themes/liquid-variables/collection
+{% endcomment %}
+{% if section.settings.collection-ad-text_richtext != '' %}
+{%- assign paginate_limit = section.settings.collection-products-per-page | minus: 1 -%}
+{% else %}
+{%- assign paginate_limit = section.settings.collection-products-per-page -%}
+{% endif %}
+
+{% paginate collection.products by paginate_limit %}
+
+{% comment %}
+Use .grid--rev so that the collection tags appear below the products on mobile
+{% endcomment %}
+
+<div class="grid--full" id="collection-template" data-section-id="{{section.id}}" data-section-type="collection">
+  {%if section.settings.include-breadcrumb %}
+  <div class="grid__item  large--one-whole">
+    {% include 'breadcrumb' %}
+  </div>
+  {%endif%}
+  <div class="grid__item collection-mobile-bg large--one-whole">
+    <div class="collection-image-grid collection-desktop-bg card-shadow">
+    {% if section.settings.collection-banner %}
+      {% if collection.image %}
+      {% if section.settings.image_height %}
+           <div >
+            {% assign img_url = collection.image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload lazystretch"
+                      src="{{ collection.image | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ collection.image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ collection.image.alt }}">
+           </div>
+      {%else%}
+          <div class="collection-featured-image-{{ section.settings.collection-image-height }} lazyload lazypreload" 
+          data-bgset="{% include 'bgset', image: collection.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover"
+          style="background-image: url({{ collection.image | img_url: "300x300"}});"></div>
+      {%endif%}
+      {% endif %}
+    {% endif %}
+      {% comment %}
+      Different markup if a collection description exists
+      {% endcomment %}
+      {% if collection.description != blank %}
+      <header class="section-header collection-header grid__item">
+        <h1 class="collection__title">{{ collection.title }}</h1>
+        <div class="rte rte--header collection-desc">
+          {{ collection.description }}
+        </div>
+        <a href="#productOutput" id="collection-down-arrow"><img src="{{ "down-arrow.svg" | asset_url}}"></a>
+      </header>
+      {% if section.settings.show-sorting %}
+      <div class="section-header sorting-header">
+        <div class=" collection-sorting">
+          {% include 'collection-sorting' %}
+        </div>
+      </div>
+      {% endif %}
+      {% else %}
+
+      <header class="section-header collection-header grid__item">
+        <h1 class="collection__title">{{ collection.title }}</h1>
+        <a href="#productOutput" id="collection-down-arrow"><img src="{{ "down-arrow.svg" | asset_url }}"></a>
+      </header>
+      <div class="section-header sorting-header">
+        {% if section.settings.show-sorting %}
+        <div class="collection-sorting">
+          {% include 'collection-sorting' %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if collection.products_count < 1 %}
+  <div class="grid__item large--one-whole">
+    <div class="tbm_no-collection card-shadow">
+      <h3>{{ 'collections.general.no_matches' | t }}</h3>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="grid__item collection-products {% if section.settings.collection-style == "grid" %}collection-grid{% endif %}" id="productOutput">
+  {% if section.settings.collection-style == "card" %}
+    <div class="grid--full inner-grid {% if section.settings.collection-column-width == 5 %}five-row{% endif %}">
+      {% for product in collection.products  %}
+      <div id="gridparent" class="grid__item {{ collection_products_per_row }} quarter-width medium--one-half small--one-half ee product-second-square-{{ forloop.index }}">
+        <div id="dummy"></div>
+        {% include 'grid-rework' %}
+      </div>
+      {% if forloop.index == 2 and section.settings.collection-ad-text_richtext != '' or forloop.index == 2 and section.settings.collection-image %}
+      <div id="gridparentad" class="grid__item  collection-ad-mobile margin-B-M {{ collection_products_per_row }} quarter-width product-square-grid-ad medium--one-half ff small--one-whole product-grid-square">
+        <div id="dummy"></div>
+        <div class="collection-page-ad card-shadow collection-product collection-box-1" id="element">
+          {%if section.settings.collection-image%}
+            {%if section.settings.collection-ad-link%}<a href='{{section.settings.collection-ad-link}}' class="image-tag">{%endif%}
+                {% assign img_url = section.settings.collection-image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload lazystretch"
+                      src="{{ section.settings.collection-image | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ section.settings.collection-image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ section.settings.collection-image.alt }}">
+           {%if section.settings.collection-ad-link%}</a>{%endif%}
+          {%else%}
+          <div class="collection-ad-text rte">
+            <h1>{{ section.settings.collection-ad-text_richtext | truncate: 140 }}</h1>
+          </div>
+          {%endif%}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+      {% assign grid_item_width = collection_products_per_row | append: " medium--one-half small--one-whole" %}
+      <div class="section-background card-shadow">
+        <div class="index-pgi">
+        {% for product in collection.products  %}    
+          {% include 'product-grid-item' %} 
+        {% endfor %}
+        </div>
+        </div>
+    {% endif %}
+    {% if paginate.pages > 1 %}
+    <div class="pagination collection-paginate">
+      {{ paginate | default_pagination | replace: '&laquo; Previous', '&larr;' | replace: 'Next &raquo;', '&rarr;' }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endpaginate %} 
+
+{% schema %}
+{
+"name": "Collection pages",
+"settings": [
+{
+"type": "header",
+"content": "Customize Grid"
+},
+{
+"type": "checkbox",
+"id": "show-sorting",
+"label": "Enable sorting"
+},
+{
+"type": "checkbox",
+"id": "image_height",
+"label": "Use image height"
+},
+{
+    "type":   "range",
+    "id":     "collection-image-height",
+    "min":       300, 
+    "max":       550,
+    "step":      50,
+    "unit":      "px",
+    "label":     "Collection banner height",
+    "default":   350,
+    "info": "Only works if image height setting above is unchecked"
+},
+{
+"type": "checkbox",
+"id": "collection-banner",
+"label": "Enable collection image",
+"default": true
+},
+{
+"type": "select",
+"id": "collection-style",
+"options": [
+{
+"value": "grid",
+"label": "Grid"
+},
+{
+"value": "card",
+"label": "Card"
+}
+],
+"default": "card",
+"label": "Collection style"
+},
+{
+"type":   "range",
+"id":     "collection-column-width",
+"min":       2,
+"max":       5,
+"step":      1,
+"label":     "Products per row",
+"default":   5
+},
+{
+"type":   "range",
+"id":     "collection-products-per-page",
+"min":       1,
+"max":       50,
+"step":      1,
+"label":     "Products per page",
+"default":   25
+},
+{
+"type": "header",
+"content": "Product style"
+},
+{
+"type":   "range",
+"id":     "collection-product-overlay",
+"min":       25,
+"max":       100,
+"step":      15,
+"unit":       "%",
+"label":     "Overlay opacity on hover",
+"default":   25
+},
+{
+"type": "checkbox",
+"id": "collection-product-size",
+"label": "Set product images to fill grid"
+},
+{
+"type": "header",
+"content": "Customize ad"
+},
+{
+"type": "richtext",
+"id": "collection-ad-text_richtext",
+"label": "Text",
+"default": "<p>Display store wide promotions on your collection pages.</p>",
+"info": "Limited to 140 characters"
+},
+{
+"type": "checkbox",
+"id": "collection_ad_custom_background",
+"label": "Enable custom background color"
+},
+{
+"type": "color",
+"id": "collection-ad-color-background",
+"label": "Background color",
+"default": "#252525"
+},
+{
+  "type": "image_picker",
+  "id": "collection-image",
+  "label": "Use image for AD"
+  },
+      {
+  "type": "url",
+  "id":"collection-ad-link",
+  "label": "Ad image link"
+  }
+]
+
+}
+{% endschema %}

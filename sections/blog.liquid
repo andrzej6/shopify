@@ -1,0 +1,287 @@
+<!-- /sections/blog.liquid -->
+{% comment %}
+Loop through a defined number of articles with the 'paginate' tag.
+Don't forget to close the tag after your loop.
+{% endcomment %}
+
+
+<style>
+{%unless section.settings.blog_show_meta or section.settings.blog_show_rss or section.settings.tags %}
+.blog-header .blog {
+ margin-bottom:0;
+}
+{%endunless%}
+</style>
+<div data-section-id="{{section.id}}" data-section-type="blogs">
+{% paginate blog.articles by 5 %}
+<div class="grid--full">
+  {% if section.settings.image %}
+      {% if section.settings.image_height %}
+           <div>
+            {% assign img_url = section.settings.image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+            <img class="lazyload lazystretch"
+            src="{{ section.settings.image | img_url: '300x' }}"
+            data-src="{{ img_url }}"
+            data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+            data-aspectratio="{{ section.settings.image.aspect_ratio }}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            alt="{{ section.settings.image.alt }}">
+           </div>
+      {%else%}
+          <div class="collection-featured-image-{{ section.settings.page-image-height }} lazyload lazypreload"
+          data-bgset="{% include 'bgset', image: section.settings.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover" 
+          style="background-color: white; background-image: url({{ section.settings.image | img_url: '300x', format: 'pjpg' }});">
+          </div>
+      {%endif%}
+  {% endif %}
+  <div class="blog-header">
+    <h1 class="collection__title blog">{{ blog.title }}</h1>
+    {% if section.settings.tags %}
+    {% if blog.all_tags.size > 0 %}
+    <div class="form-horizontal">
+      <div class="clearfix filter">
+        <label for="BlogTagFilter">{{ 'blogs.sorting.title' | t }}</label>
+        <select id="BlogTagFilter">
+          <option value="/blogs/{{ blog.handle }}">{{ 'blogs.sorting.tags' | t }}</option>
+          {% for tag in blog.all_tags %}
+          <option value="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" {% if current_tags contains tag %}selected{% endif %}>{{ tag }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if section.settings.blog_text != blank %}
+    <div class="collection-desc blog">
+      {{ section.settings.blog_text }}
+    </div>
+    {% endif %}
+    {% if section.settings.blog_show_rss %}
+    <div class="footer-rss">
+<a class="footer-rss" href="{{blog.url}}.atom">
+                <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-rss" viewBox="0 0 20 20"><path fill="#444" d="M5.903 16.586a2.489 2.489 0 1 1-4.977 0 2.489 2.489 0 0 1 4.977 0zM12.956 19.075H9.43c0-4.688-3.817-8.505-8.505-8.505V7.044c6.638 0 12.031 5.393 12.031 12.031z"></path><path fill="#444" d="M15.445 19.075c0-8.028-6.493-14.52-14.52-14.52V.925c10.019 0 18.15 8.131 18.15 18.15h-3.63z"></path></svg>
+                <span class="rss-fallback-text">RSS</span>
+              </a>
+              </div>
+              {% endif %}
+  </div>
+</div>
+{% comment %}
+This template is also used for listing out articles of a specific tag.
+You can change layouts or styles by checking if current_tags is true.
+{% endcomment %}
+<div class="grid--full">
+  <div class="blog-listing">
+    {% for article in blog.articles %}
+    {% comment %}
+    Large Blog View
+    {% endcomment %}
+    <div class="grid__item one-whole medium-down--hide article blog-card">
+      {% if article.image %}
+      <div class="grid__item large--two-thirds blog-copy">
+        <h1><a href="{{ article.url }}">{{ article.title }}</a></h1>
+        {% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+        {% capture date %}<time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'month_day_year' }}</time>{% endcapture %}
+        {% if section.settings.blog_show_meta %}
+        <p>{{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}</p>
+        {% endif %}
+        {% comment %}
+        Add a surrounding div with class 'rte' to anything that will come from the rich text editor.
+        Since this is just a listing page, you can either use the excerpt or truncate the full article.
+        {% endcomment %}
+        <div class="rte">
+          {% if article.excerpt_or_content.size > 0 %}
+          {{ article.excerpt_or_content }}
+          {% else %}
+          <p>{{ article.content | strip_html | truncatewords: 100 }}</p>
+          {% endif %}
+        </div>
+        {% comment %}
+        Show off meta information like number of comments and tags.
+        {% endcomment %}
+        <ul class="inline-list">
+          {% if blog.comments_enabled? %}
+          <li>
+            <a href="{{ article.url }}#comments">
+              {{ 'blogs.comments.with_count' | t: count: article.comments_count }}
+            </a>
+          </li>
+          {% endif %}
+          <div class="blog-tags">
+          {% if section.settings.tags %}
+          {% include 'tags-article' %}
+          {% endif %}
+          </div>
+        </ul>
+        <h4><a href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></h4>
+      </div>
+      <div class="grid__item large--one-third blog-image lazyload" 
+        data-bgset="{% include 'bgset', image: article.image %}"
+        data-sizes="auto"
+        data-parent-fit="cover" 
+        style="background-image: url({{ article.image | img_url: "300x300"}});">
+      </div>
+      {% else %}
+      <div class="grid__item blog-copy">
+        <h1><a href="{{ article.url }}">{{ article.title }}</a></h1>
+        {% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+        {% capture date %}<time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'month_day_year' }}</time>{% endcapture %}
+        {% if section.settings.blog_show_meta %}
+        <p>{{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}</p>
+        {% endif %}
+        {% comment %}
+        Add a surrounding div with class 'rte' to anything that will come from the rich text editor.
+        Since this is just a listing page, you can either use the excerpt or truncate the full article.
+        {% endcomment %}
+        <div class="rte">
+          {% if article.excerpt_or_content.size > 0 %}
+          {{ article.excerpt_or_content }}
+          {% else %}
+          <p>{{ article.content | strip_html | truncatewords: 100 }}</p>
+          {% endif %}
+        </div>
+        {% comment %}
+        Show off meta information like number of comments and tags.
+        {% endcomment %}
+        <ul class="inline-list">
+          {% if blog.comments_enabled? %}
+          <li>
+            <a href="{{ article.url }}#comments">
+              {{ 'blogs.comments.with_count' | t: count: article.comments_count }}
+            </a>
+          </li>
+          {% endif %}
+              <div class="blog-tags">
+          {% if section.settings.tags %}
+          {% include 'tags-article' %}
+          {% endif %}
+          </div>
+        </ul>
+        <h4><a href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></h4>
+      </div>
+      {% endif %}
+    </div>
+    <div class="grid__item one-whole large--hide article blog-card">
+      <div class="grid__item blog-copy">
+        <h1><a href="{{ article.url }}">{{ article.title }}</a></h1>
+        {% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+        {% capture date %}<time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'month_day_year' }}</time>{% endcapture %}
+        {% if section.settings.blog_show_meta %}
+        <p>{{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}</p>
+        {% endif %}
+      </div>
+      {% if article.image %}
+      <div class="grid__item blog-image lazyload" 
+        data-bgset="{% include 'bgset', image: article.image %}"
+        data-sizes="auto"
+        data-parent-fit="cover" 
+        style="margin-bottom: 30px; background-image: url({{ article.image | img_url: "300x300"}});">
+      </div>
+      {% endif %}
+      <div class="grid__item blog-copy">
+        {% comment %}
+        Add a surrounding div with class 'rte' to anything that will come from the rich text editor.
+        Since this is just a listing page, you can either use the excerpt or truncate the full article.
+        {% endcomment %}
+        <div class="rte">
+          {% if article.excerpt_or_content.size > 0 %}
+          {{ article.excerpt_or_content }}
+          {% else %}
+          <p>{{ article.content | strip_html | truncatewords: 100 }}</p>
+          {% endif %}
+        </div>
+        {% comment %}
+        Show off meta information like number of comments and tags.
+        {% endcomment %}
+        <ul class="inline-list">
+          {% if blog.comments_enabled? %}
+          <li>
+            <a href="{{ article.url }}#comments">
+              {{ 'blogs.comments.with_count' | t: count: article.comments_count }}
+            </a>
+          </li>
+          {% endif %}
+              <div class="blog-tags">
+          {% if section.settings.tags %}
+          {% include 'tags-article' %}
+          {% endif %}
+          </div>
+        </ul>
+        <h4><a href="{{ article.url }}">{{ 'blogs.article.read_more' | t }}</a></h4>
+      </div>
+    </div>
+    {% unless forloop.last %}
+    <hr>
+    {% endunless %}
+    {% endfor %}
+    {% if paginate.pages > 1 %}
+    <hr>
+    <div class="pagination">
+      {{ paginate | default_pagination }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endpaginate %}
+</div>
+
+{% schema %}
+{
+"name": "Blog",
+"settings": [
+{
+"type": "header",
+"content": "Feature image"
+},
+{
+"type": "image_picker",
+"id": "image",
+"label": "Banner image",
+"info": "1920 x 400px .png recommended"
+},
+{
+"type": "checkbox",
+"id": "image_height",
+"label": "Use image height"
+},
+{
+"type":   "range",
+"id":     "page-image-height",
+"min":       300, 
+"max":       550,
+"step":      50,
+"unit":      "px",
+"label":     "Page banner height",
+"default":   350,
+"info": "Only works if image height setting above is unchecked"
+},
+{
+"type": "richtext",
+"id": "blog_text",
+"label": "Description text",
+"default": "<p>Use this section to provide a <em>description</em> of your blog.</p>"
+},
+{
+"type": "checkbox",
+"id": "tags",
+"default": false,
+"label": "Show tags"
+},
+{
+"type": "checkbox",
+"id": "blog_show_meta",
+"label": "Show date and author",
+"default": true
+},
+{
+"type": "checkbox",
+"id": "blog_show_rss",
+"label": "Show RSS link",
+"default": true
+}
+]
+}
+{% endschema %}

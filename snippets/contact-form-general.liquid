@@ -1,0 +1,24 @@
+<!--FORM-->
+{% form 'customer' %}
+  {{ form.errors | default_errors }}
+  {% if form.posted_successfully? %}
+  <p class="form--success secondary">{{ 'general.newsletter_form.confirmation' | t }}</p>
+  {% else %}
+  <div class="contact_form_inputs">
+    <input type="email" 
+      value="{% if customer %}{{ customer.email }}{% endif %}" 
+      name="contact[email]" 
+      id="Email"
+      placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}" 
+      class="input-group-field home" 
+      aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}">
+    <span class="input-group-btn index">
+      <button type="submit" class="btn home newsletter__submit" name="commit" id="subscribe">
+        <span class="newsletter__submit-text--large">{{ 'general.newsletter_form.section_submit' | t }}</span>
+      </button>
+    </span>
+  </div>
+  {%endif%}
+{%endform%}
+<!--FORM ENDS-->
+

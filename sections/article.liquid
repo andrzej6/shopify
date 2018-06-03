@@ -1,0 +1,297 @@
+{% comment %}
+
+Comments will not appear right after they are submitted, either to be checked for spam
+or to await moderation. When a comment is submitted, the browser is redirected to a page
+that includes the new comment id in its URL.
+Example: http://shopname.myshopify.com/blogs/news/2022072-my-post?comment=3721372
+
+More information:
+- http://docs.shopify.com/themes/liquid-variables/comment
+
+{% endcomment %}
+
+{% assign number_of_comments = article.comments_count %}
+
+{% comment %}
+If a comment was just submitted and it has no blank fields, we have an extra comment to count.
+{% endcomment %}
+{% if comment and comment.created_at %}
+{% assign number_of_comments = article.comments_count | plus: 1 %}
+{% endif %}
+
+<style>
+{% unless section.settings.enable_image %}
+@media screen and (min-width:769px){
+.blog-card{
+padding:30px 50px 50px 50px;
+}
+}
+{%endunless%}
+
+
+</style>
+<div id="blog-article-template">
+{% if article.image and section.settings.enable_image %}
+<div class="grid--full">
+<div class="article-featured-image lazyload" 
+data-bgset="{% include 'bgset', image: article.image %}"
+data-sizes="auto"
+data-parent-fit="cover" 
+style="background-image: url({{ article.image | img_url: "300x300"}});">
+</div>
+</div>
+{% endif %}
+<div class="blog-card">
+<article class="grid__item {%if section.settings.enable_sidebar%} large--three-quarters {%endif%} blog-card" itemscope itemtype="http://schema.org/Article">
+
+<div class="section-header">
+<div class="section-header__left">
+<h1>{{ article.title }}</h1>
+{% capture author %}<strong>{{ article.author }}</strong>{% endcapture %}
+{% capture date %}<time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'month_day_year' }}</time>{% endcapture %}
+<p>{{ 'blogs.article.author_on_date_html' | t: author: author, date: date }}</p>
+</div>
+</div>
+
+<div class="rte" itemprop="articleBody">
+{{ article.content }}
+</div>
+
+{%if section.settings.enable_contentTags%}
+{% comment %}
+Show off meta information like comments and tags.
+{% endcomment %}
+<ul class="inline-list">
+{% include 'tags-article' %}
+</ul>
+{%endif%}
+
+	{%if section.settings.enable_next%}
+{% comment %}
+Create links to the next and previous articles, if available.
+{% endcomment %}
+{% if blog.next_article or blog.previous_article %}
+
+<p class="clearfix">
+{% if blog.previous_article %}
+<span class="left">
+&larr; {{ 'blogs.article.older_post' | t | link_to: blog.previous_article }}
+</span>
+{% endif %}
+{% if blog.next_article %}
+<span class="right">
+{{ 'blogs.article.newer_post' | t | link_to: blog.next_article }} &rarr;
+</span>
+{% endif %}
+</p>
+{% endif %}
+{%endif%}
+{%if section.settings.rss-icon%}
+<a class="footer-rss" href="{{blog.url}}.atom">
+<svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-rss" viewBox="0 0 20 20"><path fill="#444" d="M5.903 16.586a2.489 2.489 0 1 1-4.977 0 2.489 2.489 0 0 1 4.977 0zM12.956 19.075H9.43c0-4.688-3.817-8.505-8.505-8.505V7.044c6.638 0 12.031 5.393 12.031 12.031z"></path><path fill="#444" d="M15.445 19.075c0-8.028-6.493-14.52-14.52-14.52V.925c10.019 0 18.15 8.131 18.15 18.15h-3.63z"></path></svg>
+<span class="rss-fallback-text">RSS</span>
+</a>
+{%endif%}
+
+
+{% if blog.comments_enabled? %}
+<hr class="comment-hr">
+
+<h3>{{ 'blogs.comments.with_count' | t: count: number_of_comments }}</h3>
+
+
+
+{% comment %}
+Just like blog.liquid page, define how many comments should be on each page.
+{% endcomment %}
+{% paginate article.comments by 5 %}
+{% comment %}
+#comments is required, it is used as an anchor link by Shopify.
+{% endcomment %}
+<div id="comments">
+
+{% if comment and comment.created_at %}
+<p class="note form-success">
+{% if blog.moderated? %}
+{{ 'blogs.comments.success_moderated' | t }}
+{% else %}
+{{ 'blogs.comments.success' | t }}
+{% endif %}
+</p>
+{% endif %}
+
+{% if number_of_comments > 0 %}
+<ul class="no-bullets">
+{% comment %}
+If a comment was just submitted with no blank field, show it.
+{% endcomment %}
+{% if comment and comment.created_at %}
+<li id="{{ comment.id }}" class="comment first{% if article.comments_count == 0 %} last{% endif %}">
+{% include 'comment' %}
+</li>
+
+<li><hr class="comment-hr-active"></li>
+{% endif %}
+
+{% comment %}
+Showing the rest of the comments.
+{% endcomment %}
+{% for comment in article.comments %}
+<li id="{{ comment.id }}" class="comment{% unless number_of_comments > article.comments_count %}{% if forloop.first %} first{% endif %}{% endunless %}{% if forloop.last %} last {% endif %}">
+{% include 'comment' %}
+</li>     
+<li><hr class="comment-hr-active"></li>
+{% endfor %}
+</ul>
+
+{% if paginate.pages > 1 %}
+<hr >
+<div class="pagination">
+{{ paginate | default_pagination | replace: '&laquo; Previous', '&larr;' | replace: 'Next &raquo;', '&rarr;' }}
+</div>
+{% endif %}
+
+<hr class="comment-hr-active">
+
+{% endif %}
+
+<div class="form-vertical commentblog">
+{% form 'new_comment', article %}
+<h3>{{ 'blogs.comments.title' | t }}</h3>
+
+{{ form.errors | default_errors }}
+
+<div class="grid--full">
+
+<div class="grid__item large--one-half">
+  <label for="CommentAuthor" class="hidden-label">{{ 'blogs.comments.name' | t }}</label>
+  <input type="text" name="comment[author]" id="CommentAuthor" class="input-full{% if form.errors contains 'author' %} error{% endif %}" placeholder="{{ 'blogs.comments.name' | t }}" value="{{ form.author }}" autocapitalize="words">
+
+  <label for="CommentEmail" class="hidden-label">{{ 'blogs.comments.email' | t }}</label>
+  <input type="email" name="comment[email]" id="CommentEmail" class="input-full{% if form.errors contains 'email' %} error{% endif %}" placeholder="{{ 'blogs.comments.email' | t }}" value="{{ form.email }}" autocorrect="off" autocapitalize="off">
+  <input type="submit" class="btn blogcomment" value="{{ 'blogs.comments.post' | t }}">
+</div>
+<div class="grid__item large--one-half">
+  <label for="CommentBody" class="hidden-label">{{ 'blogs.comments.message' | t }}</label>
+  <textarea name="comment[body]" id="CommentBody" class="input-full{% if form.errors contains 'body' %} error{% endif %} blogcomment" placeholder="{{ 'blogs.comments.message' | t }}">{{ form.body }}</textarea>
+</div>
+
+</div>
+
+{% if blog.moderated? %}
+<p>{{ 'blogs.comments.moderated' | t }}</p>
+{% endif %}
+
+{% endform %}
+</div>
+
+</div>
+{% endpaginate %}
+{% endif %}
+
+</article>
+{%if section.settings.enable_sidebar%}
+<aside class="grid__item large--one-quarter blog-sidebar" role="complementary">
+	{%if section.settings.enable_recent%}
+{% comment %}
+Recent blog posts
+{% endcomment %}
+<h4>{{ 'blogs.sidebar.recent_articles' | t }}</h4>
+<ul class="no-bullets">
+{% for article in blogs[blog.handle].articles limit:6 %}
+<li>
+<a href="{{ article.url }}">{{ article.title }}</a>
+<br>
+<time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'month_day_year' }}</time>
+</li>
+{% endfor %}
+</ul>
+{%endif%}
+
+{%if section.settings.enable_tags%}
+{% comment %}
+Blog tags
+{% endcomment %}
+{% if blog.all_tags.size > 0 %}
+<h4>{{ 'blogs.sidebar.categories' | t }}</h4>
+<ul class="no-bullets">
+{% for tag in blog.all_tags %}
+{% if current_tags contains tag %}
+<li>{{ tag }}</li>
+{% else %}
+<li>{{ tag | link_to_tag: tag }}</li>
+{% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+<hr class="comment-hr">
+{%endif%}
+
+{%if section.settings.enable_social%}
+
+
+{% if settings.share_facebook or settings.share_twitter or settings.share_pinterest%}
+<h4 >{{ 'products.product.social_sharing' | t }}</h4>
+{% include 'social-sharing', share_title: article.title, share_permalink: article.url, share_image: article.image %}
+{% endif %}
+{%endif%}
+
+</aside>
+{%endif%}
+</div>
+
+</div>
+
+{% schema %}
+{
+"name": "Article",
+"settings": [
+{
+"type": "checkbox",
+"id": "enable_image",
+"label": "Enable featured image"
+},
+{
+"type": "checkbox",
+"id": "rss-icon",
+"label": "Enable article rss"
+},
+{
+"type": "checkbox",
+"id": "enable_contentTags",
+"label": "Enable article tags",
+"info":"Shows up underneath main content"
+},
+{
+"type": "checkbox",
+"id": "enable_next",
+"label": "Enable previous/next arrows"
+},
+{
+"type": "header",
+"content": "Sidebar"
+},
+{
+"type": "checkbox",
+"id": "enable_sidebar",
+"label": "Enable sidebar"
+},
+{
+"type": "checkbox",
+"id": "enable_recent",
+"label": "Enable recent articles"
+},
+{
+"type": "checkbox",
+"id": "enable_tags",
+"label": "Enable sidebar tags",
+"info": "Shows up in sidebar beside main content"
+},
+{
+"type": "checkbox",
+"id": "enable_social",
+"label": "Enable social sharing"
+}
+]
+}
+{% endschema %}

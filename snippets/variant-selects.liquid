@@ -1,0 +1,125 @@
+{% comment %}
+/snippets/variant-selects.liquid
+
+Creates the appropriate select(s) for this product's variants. If the product only has 1 
+variant, a hidden input is generated instead. The hidden variant will contain all items 
+below unless stated otherwise.
+
+Each select will contain:
+-the base price (in cents) of the product (value of product.price)
+
+Each option will contain the variant's:
+-SKU
+-base price (in cents)
+-compare at price (in cents), if available
+-availability
+-featured image's ID (NOT included in the hidden input)
+
+NOTE: the id attribute is used by the theme's JavaScript, specifically in theme.Variants. 
+Do not adjust these attributes unless you also adjust it in the JavaScript code.
+{% endcomment %}
+
+{% comment %} Classes used for the selects {% endcomment %}
+{%- assign sharedSelectClasses = 'product-single__variants mobile-prod-padding' | append:' ' -%}
+{%- assign singleOpSelectClasses = sharedSelectClasses | append:'single-variant-available' -%}
+{%- assign multiOpSelectClasses =  sharedSelectClasses | append:'multiop-select' -%}
+{%- assign showSwatch =  settings.use_swatches -%}
+
+{% comment %} Section variables {% endcomment %}
+{%- assign varGenProd = product -%}
+{%- assign mainVariant = varGenProd.selected_or_first_available_variant -%}
+<div class="variant-group" data-swatch="{{showSwatch}}">
+
+{% if varGenProd.variants.size > 1 %}
+  {% if varGenProd.options.size == 1 %}
+  {% if showSwatch %}
+  {% if product.available and product.variants.size > 1 %}
+  {% for option in product.options %}
+   {% include 'swatch' with option, total:1 %}
+   {%endfor%}
+  {% endif %}
+{%else%}
+  {% comment %} Generate a select for a product with multiple variants, but only 1 option {% endcomment %}
+   {% assign showDrop = false%}
+     {% for variant in varGenProd.variants %}
+    {% if variant.available %}
+    {% assign showDrop = true%}
+    {%endif%}
+    {%endfor%}
+    {%if showDrop%}
+  <label for="productSelect">{{ varGenProd.options.first | escape }}</label>
+  <select name="id" id="productSelect" class="{{ singleOpSelectClasses }}" data-prod-base-price="{{ varGenProd.price }}">
+   {% assign status = false%}
+    {% for variant in varGenProd.variants %}
+    {% if variant.available %}
+    {% assign status = true%}
+    <option {% if variant == mainVariant %}selected="selected"{% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}" data-base-price="{{variant.price }}" {% unless variant.compare_at_price == blank %}data-compare-price="{{ variant.compare_at_price }}"{%endunless%} {% unless variant.available %}data-unavailable="true"{% endunless %} data-img-id="{{ variant.featured_image.id }}" data-title="{{variant.title}}">
+      {{ variant.title }}
+    </option>
+    {% else %}
+    <option disabled="disabled">
+      {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+    </option>
+    {% endif %}
+
+    {% endfor %}
+    {% unless status%}
+    <option>Sold out</option>
+    {% endunless%}
+  </select>
+  {%endif%}
+  {%endif%}
+  {% else %}
+  {% comment %} Generate selects for a product with multiple options {% endcomment %}
+    {% if showSwatch %}
+  {% if product.available and product.variants.size > 1 %}
+  {% for option in product.options %}
+  <div class="variant-group-multiple">
+    {% include 'swatch' with option, index: forloop.index0, total: forloop.length %}
+  </div>
+  {% endfor %}
+{% endif %}
+  <select name="id" id="actualProdSelect" data-prod-base-price="{{ product.price }}" style="display:none">
+    {% for variant in varGenProd.variants %}
+    {% comment %} variantOps (option[data-opid]) is a special string to ID the option based on the selected options {% endcomment %}
+    {%- assign variantOps = variant.option1 | escape -%}
+    {%- assign variantOps = variantOps | append:' / ' | append:variant.option2 | escape -%}
+    {% unless variant.option3 == blank %}{%- assign variantOps = variantOps | append:' / ' | append:variant.option3 | escape -%}{% endunless %}
+    <option {% if variant == mainVariant %}selected="selected"{% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}" data-base-price="{{ variant.price }}" {% unless variant.compare_at_price == blank %}data-compare-price="{{ variant.compare_at_price }}"{%endunless%} data-opid="{{ variantOps }}" data-img-id="{{ variant.featured_image.id }}" {% unless variant.available %}data-unavailable="true"{% endunless %} data-title="{{variant.title}}">
+      {{ variant.title }}
+    </option>
+    {% endfor %}
+  </select>
+{%else%}
+  {% for option in varGenProd.options_with_values %}
+  <div class="variant-group-multiple">
+  <label for="productSelect-op{{ forloop.index0 }}">{{ option.name | escape }}</label>
+  <select id="productSelect-op{{ forloop.index0 }}" class="{{ multiOpSelectClasses }}" data-opnum="{{ forloop.index0 }}">
+    {% for optionVal in option.values %}
+    <option value="{{ optionVal | escape }}" {% if mainVariant.option1 == optionVal or mainVariant.option2 == optionVal or mainVariant.option3 == optionVal %}selected{% endif %}>{{ optionVal | escape }}</option>
+    {% endfor %}
+  </select>
+  </div>
+  {% endfor %}
+  <select name="id" id="actualProdSelect" data-prod-base-price="{{ product.price }}" style="display:none">
+    {% for variant in varGenProd.variants %}
+    {% comment %} variantOps (option[data-opid]) is a special string to ID the option based on the selected options {% endcomment %}
+    {%- assign variantOps = variant.option1 | escape -%}
+    {%- assign variantOps = variantOps | append:' / ' | append:variant.option2 | escape -%}
+    {% unless variant.option3 == blank %}{%- assign variantOps = variantOps | append:' / ' | append:variant.option3 | escape -%}{% endunless %}
+    <option {% if variant == mainVariant %}selected="selected"{% endif %} data-sku="{{ variant.sku }}" value="{{ variant.id }}" data-base-price="{{ variant.price }}" {% unless variant.compare_at_price == blank %}data-compare-price="{{ variant.compare_at_price }}"{%endunless%} data-opid="{{ variantOps }}" data-img-id="{{ variant.featured_image.id }}" {% unless variant.available %}data-unavailable="true"{% endunless %} data-title="{{variant.title}}">
+      {{ variant.title }}
+    </option>
+    {% endfor %}
+  </select>
+  {%endif%}
+  {% endif %}
+{% else %}
+  {% comment %} There is only a single variant, so generate a simple, hidden input for it {% endcomment %}
+  <input type="hidden" name="id" data-sku="{{ variant.sku }}" data-base-price="{{ mainVariant.price }}" {% unless mainVariant.compare_at_price == blank %}data-compare-price="{{ mainVariant.compare_at_price }}"{% endunless %} value="{{ mainVariant.id }}" data-title="{{variant.title}}"/>
+{% endif %}
+
+
+</div>
+
+

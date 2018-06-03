@@ -1,0 +1,182 @@
+{%comment%}
+The complex nature of Loft's mobile nav requires some linklist handle targeting (legacy method) since we cycle out divs for the transition effect. In this snippet, you'll see a mixture of both the legacy and the new method for setting up the nested nav
+
+Further documentation on the nested navigation setup and compatibility layer can be found here: 
+https://help.shopify.com/themes/development/building-nested-navigation
+
+{%endcomment%}
+
+{% unless list_handles_str %}
+{% assign list_handles_str = "/," %}
+{% endunless %}
+
+{%comment%} Need at least the Main Menu. Rest of needed items is gathered from this.{%endcomment%}
+{% assign curr_handle = section.settings.mobileMenu | handleize %}
+{% assign select_handle = section.settings.mobileMenu %}
+<nav aria-label="MobileNavigation" aria-haspopup="true">
+<!-- Parent links div -->
+<div id="{{curr_handle}}-mnav" class="mobile-nav__link-group" {%unless curr_handle == select_handle%}style="display:none"{%endunless%}>
+  <div>
+    {% if curr_handle == select_handle%}
+    <h3 class="mobile-linklist-title">{{linklists[section.settings.mobileMenu].title}}</h3>
+    <hr class="mobile-menu-hr">
+    {% else %}
+    <h3 class="mobile-linklist-title">
+      <span class='go-back'><span class="fa fa-angle-left chevron-size">
+      </span>{{linklists[section.settings.mobileMenu].title}}</span></h3>
+      <span class="fallback-text">Go Back</span>
+    <hr class="mobile-menu-hr">
+    {% endif %}
+  </div>
+  <ul role="menu">
+    {% for link in linklists[curr_handle].links %}
+    {% assign link_title = link.title %}
+    {% assign link_handle = link.title | handleize %}
+    {% assign level = 0 %}
+    {% if link.links != blank and link.levels > 0 %}
+    {% assign compare_handle_str = link_handle | append:'/,' | prepend:'/,' %}
+    {% unless list_handles_str contains compare_handle_str %}
+    {% assign list_handles_str = list_handles_str | append:link_handle | append:'/,' %}
+    {% endunless %}
+    {% for sublist_link in link.links %}   
+    {% if sublist_link.links != blank %}
+    {% assign level = 2 %}
+    {% assign list_handles_str = list_handles_str | append:sublist_link.handle | append:'-btm/,' %}  
+    {% endif %}
+    {% endfor %}
+    <li id="{{link_handle}}-li" class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %} mobile-nav__has-sublist" aria-haspopup="true" role="menuitem">
+       <a href="{{ link.url }}" class="mobile-nav__link mobile-nav__text-link"><h3>{{ link.title }}</h3></a>
+      <div class="mobile-nav__has-sublist">
+        <div class="mobile-nav__toggle">
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-open">
+          <span class=" fa fa-angle-right chevron-size mobile-nav-arrow" aria-hidden="true"></span>
+          <span class="fallback-text">Open</span>              
+        </button>
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-close">
+          <span class="fa fa-angle-right chevron-size mobile-nav-arrow" aria-hidden="true"></span>  
+          <span class="fallback-text">Go Back</span>      
+        </button>     
+        </div> 
+      </div>
+    </li>
+    {% else %}
+    <li class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %}" role="menuitem">
+      <a href="{{ link.url }}" class="mobile-nav__link"><h3>{{ link.title }}</h3></a>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+
+{%comment%}
+Here we determine if the linklist has grandchild (another level) or not.
+If it does, then we output those grandchild divs so we can reference them. If it doesn't, then output the linklist as normal.
+As mentioned above, this is where we use the modified linklist handle we grabbed above to find the right linklist since we don't have the context of the parent linklist anymore.
+{%endcomment%}
+
+{% assign list_handles = list_handles_str | split:'/,' %}
+{% for curr_list_handle in list_handles %}
+{% unless curr_list_handle == blank %}
+{% if curr_list_handle contains '-btm' %}
+{% assign is_bottom = true %}
+{% assign curr_handle = curr_list_handle | replace:'-btm','' %}
+{% else %}
+{% assign curr_handle = curr_list_handle %}
+{% assign is_bottom = false %}
+{% endif %}
+
+{% for parentLink in linklists[section.settings.mobileMenu].links %}
+{% assign childlist = parentLink.title | handleize %}
+{% assign childlistCOND = linklists[childlist].title | handleize %}
+{% if curr_handle == childlistCOND %}
+{% assign actual_title = linklists[childlist].title%}
+{% else %}
+{% for childLink in linklists[childlist].links%}           
+{% assign grandchildlist = childLink.title | handleize %}
+{% assign grandchildlistCOND = linklists[grandchildlist].title | handleize %}
+{% if curr_handle == grandchildlistCOND %}
+{% assign actual_title = linklists[grandchildlist].title%}    
+{%endif%}        
+{%endfor%}
+{%endif%}
+{%endfor%}
+
+<div id="{{curr_handle}}-mnav" class="mobile-nav__link-group" {%unless curr_handle == select_handle%}style="display:none"{%endunless%}>
+  {% unless is_bottom == true%}
+  <!-- Child links div -->
+  {%else%}
+  <!-- Grandchild links div -->
+  {%endunless%}
+  <div>
+    {% if curr_handle == select_handle%}
+    <h3 class="mobile-linklist-title">{{actual_title}}</h3>
+    <hr class="mobile-menu-hr">
+    {% else %}
+    <h3 class="mobile-linklist-title">
+      <span class='go-back'><span class="fa fa-angle-left chevron-size "></span>{{actual_title}}</span></h3>
+    <hr class="mobile-menu-hr">
+    {% endif %}
+  </div> 
+  <ul role="menu">    
+    {% assign menuHandle = false %}
+    {% for parentLink in linklists[section.settings.mobileMenu].links %}
+    {% assign cLink = parentLink.title | handleize %} 
+    {% if curr_handle == cLink %}
+    {% assign curr_handle = cLink %}
+    {% assign menuHandle = true %}
+    {% else %}
+    {% if linklists[cLink].links != blank %}    
+    {% for links in parentLink.links %}
+    {% assign childLink = links.title | handleize %}             
+    {% if curr_handle == childLink %} 
+    {% assign curr_handle = childLink %}
+    {% assign menuHandle = true %}
+    {% break%} 
+    {% endif%}
+    {% endfor%}   
+    {% endif%}    
+    {% endif%}
+
+    {% if menuHandle %}   
+    {% for link in linklists[curr_handle].links %} 
+    {% assign link_handle = link.title | handleize %}
+    {% if link.links != blank and is_bottom == false %}   
+    {% assign compare_handle_str = link_handle | append:'/,' | prepend:'/,' %}
+    {% unless list_handles_str contains compare_handle_str %}
+    {% assign list_handles_str = list_handles_str | append:link_handle | append:'/,' %}
+    {% endunless %}
+    {% for sublist_link in link.links %}
+    {% if sublist_link.links != blank %}
+    {% assign list_handles_str = list_handles_str | append:sublist_link.handle | append:'-btm/,' %}          
+    {% endif %}
+    {% endfor %}
+    <li id="{{link_handle}}-li" class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %} mobile-nav__has-sublist" aria-haspopup="true" role="menuitem">
+       <a href="{{ link.url }}" class="mobile-nav__link mobile-nav__text-link"><h3>{{ link.title }}</h3></a>
+       <div class="mobile-nav__has-sublist">
+      <div class="mobile-nav__has-sublist">       
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-open">        
+          <span class=" fa fa-angle-right chevron-size mobile-nav-arrow" aria-hidden="true"></span> 
+          <span class="fallback-text">Open</span>          
+        </button>
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-close">
+          <span class="fa fa-angle-right chevron-size" aria-hidden="true"></span>  
+          <span class="fallback-text">Go Back</span>        
+        </button>   
+        </div>   
+      </div>
+    </li>
+    {% else %}
+    <li class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %}" role="menuitem">
+      <a href="{{ link.url }}" class="mobile-nav__link"><h3>{{ link.title }}</h3></a>
+    </li>
+    {% endif %}    
+    {% endfor %}
+    {% endif %}
+    {% assign menuHandle = false %}
+    {% endfor %}
+  </ul>
+</div>
+{% endunless %}
+{% endfor %}
+
+</nav>

@@ -1,0 +1,24 @@
+{% if linklists[link_handle].links != blank and is_bottom == false %}
+  {% assign compare_handle_str = link_handle | append:'/,' | prepend:'/,' %}
+  {% unless list_handles_str contains compare_handle_str %}
+  	{% assign list_handles_str = list_handles_str | append:link_handle | append:'/,' %}
+  {% endunless %}
+  {% include 'loft-nav-gather-sublist' %}
+  <li id="{{link_handle}}-li" class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %} mobile-nav__has-sublist" aria-haspopup="true">
+    <div class="mobile-nav__has-sublist">
+      <a href="{{ link.url }}" class="mobile-nav__link"><h3>{{ link.title }}</h3></a>
+      <div class="mobile-nav__toggle">
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-open">
+          <span class=" fa fa-angle-right chevron-size" aria-hidden="true"></span>         
+        </button>
+        <button type="button" class="icon-fallback-text mobile-nav__toggle-close">
+          <span class="fa fa-angle-right chevron-size" aria-hidden="true"></span>        
+        </button>
+      </div>
+    </div>
+  </li>
+{% else %}
+  <li class="mobile-nav__item{% if link.active %} mobile-nav__item--active{% endif %}">
+    <a href="{{ link.url }}" class="mobile-nav__link"><h3>{{ link.title }}</h3></a>
+  </li>
+{% endif %}

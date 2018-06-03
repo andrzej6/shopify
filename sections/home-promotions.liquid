@@ -1,0 +1,294 @@
+<!-- /sections/home-promotions.liquid -->
+{% include 'image-style' %}
+<!-- Desktop Promotions-->
+<div class="grid--full home-promotions flex-it-{{ section.id }} {{ block.shopify_attributes }}">
+  {%- assign promotion_block_counter = 0 -%}
+  {%if section.settings.block-width == 'split'%}
+  {% assign promotion_block_size = "50%" %}
+  {%elsif section.settings.block-width  == 'full-width'%}
+  {% assign promotion_block_size = "100"%}
+  {%endif%}
+  {% for block in section.blocks %}
+  {% assign promotion_block_counter = promotion_block_counter | plus:1 %}
+
+  {% case section.settings.block-width %}
+  {% when 'split' %}
+  {%- assign block_width1 = 'large--two-fifths' -%}
+  {%- assign block_width2 = 'large--three-fifths second-block-padding' -%}
+  {%- assign extra_padding = '0 0px 30px 0' -%}
+  {%- assign extra_padding_mobile = '0 0px 15px 0' -%}
+  {%- assign extra_padding_block2 = '0 15px 0 0' -%}
+  {%- assign split_blocks1 = 'large--three-fifths' -%}
+  {%- assign split_blocks2 = 'large--two-fifths' -%}
+  {%- assign flexdirection = 'row' -%}
+
+
+  {% when 'full-width' %}
+  {%- assign block_width1 = 'one-whole' -%}
+  {%- assign block_width2 = 'one-whole' -%}
+  {%- assign extra_padding = '0px 0 30px 0' -%}
+  {%- assign extra_padding_mobile = '0px 0 15px 0' -%}
+  {%- assign split_blocks1 = 'large--one-half medium--down-one-whole' -%}
+  {%- assign split_blocks2 = 'large--one-half' -%}
+  {%- assign flexdirection = 'column' -%}
+
+  {% endcase %}
+
+  {% case block.type %}
+  {% when 'newsletter' %}
+
+  <div id="contact_form" class="grid__item medium-down--one-whole  single-block-{{section.id}} promotion-block-padding {% if forloop.last %}{{ block_width2 }}{% else %}{{ block_width1 }}{% endif %} newsletterh flex-direction text-center home-reveal {{ block.shopify_attributes }}">
+    <div class="newsletter-content-class card-shadow newsletter-color ">
+      <div class="newsletter flex-one">
+        <div>
+          <h1 class="home-promotion-text secondary">{{ block.settings.title | escape }}</h1>
+          <div class="h5 secondary"><p>{{ block.settings.promotion-subheading_richtext}}</p></div>
+          {% include 'contact-form-general' %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% when 'text' %}
+  <div class="grid__item medium-down--one-whole promotion-content single-block-{{section.id}} promotion-block-padding {% if forloop.last %}{{ block_width2 }}{% else %}{{ block_width1 }}{% endif %} promotionh flex-direction home-reveal {{ block.shopify_attributes }}">
+    <div class="grid--full content-class card-shadow flex-one">
+
+      <div class="grid__item {{ split_blocks1 }} promotions-right-text text-center flexblock-{{ section.id }}">
+        {% if block.settings.promotions-img %}
+        <div class="grid__item large--hide promotions-right-image medium-down--show">
+
+                {% assign img_url = block.settings.promotions-img  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload lazystretch"
+                      src="{{ block.settings.promotions-img | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ block.settings.promotions-img.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ block.settings.promotions-img.alt }}">
+
+        </div>
+        {% else %}
+        <div class="grid__item large--hide promotions-right-image medium-down--show">
+          <img src="{{ 'temp-product2.jpg' | asset_url }}" class="promotion-placeholder-image">
+        </div>
+        {% endif %}
+        <div>
+          <h1 class="black">{{ block.settings.title | escape }}</h1>
+        {% assign promoDesc = block.settings.featured-promotion-subtitle_richtext %}
+        {% if promoDesc.size > 200 %}
+        {% if section.settings.block-width != 'full-width' %}
+        {% assign flexsignal = 'column-reverse' %}
+        {% else %}
+        {% assign flexsignal = 'row' %}
+        {% endif %}
+        {% else %}
+        {% assign flexsignal = 'row' %}
+        {% endif %}
+          {% if block.settings.featured-promotion-subtitle_richtext != blank %}
+          <div class="h5 featured-promotion-text"><p>{{ block.settings.featured-promotion-subtitle_richtext }}</p></div>
+          {% endif %}
+          {% if block.settings.promo-btn-link != blank %}
+        <div class="promotion-CTA">
+          <a href="{{ block.settings.promo-btn-link }}" class="btn">{{ block.settings.promo-btn-txt | escape }}</a>
+        </div>
+        {% endif %}
+        </div>
+      </div>
+      {% if block.settings.promotions-img %}
+      <div class="grid__item {{ split_blocks2 }} promotions-right-image medium-down--hide flex-one" >
+       {% assign img_url = block.settings.promotions-img  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload lazystretch"
+                      src="{{ block.settings.promotions-img | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ block.settings.promotions-img.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ block.settings.promotions-img.alt }}">
+      </div>
+      {% else %}
+      <div class="grid__item large--two-fifths promotions-right-image medium-down--hide flex-one" >
+        <img src="{{ 'temp-product2.jpg' | asset_url }}" class="promotion-placeholder-image">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endcase %}
+  {% endfor %}
+</div>
+<style>
+   @media screen and (min-width:901px){
+    .flexblock-{{ section.id }}{
+      flex-direction: {{ flexsignal }};
+    }
+  }
+  @media screen and (min-width:1181px){
+    .block-padding-{{section.id}} {
+      padding: {{ extra_padding }};
+    }
+    .block2-padding-{{section.id}} {
+      padding: {{ extra_padding_block2 }};
+    }
+  }
+
+@media screen and (min-width:769px){
+  .flex-it-{{ section.id }} {
+      display: flex;
+    flex-direction: {{ flexdirection }};
+  }
+}
+    @media screen and (max-width:768px){
+  .flex-it-{{ section.id }} {
+      display: flex;
+    flex-direction: column;
+  }
+}
+</style>
+{%if promotion_block_counter != 2%}
+{%- assign extra_padding = '0px 0 30px 0' -%}
+{%- assign extra_padding_mobile = '0px 0 15px 0' -%}
+<style>
+  .single-block-{{section.id}}{
+    width:100%;
+    padding-left:0;
+  }
+    @media screen and (min-width:1181px){
+    .promotion-block-padding {
+      padding: {{ extra_padding }};
+    }
+  }
+  @media screen and (max-width:1180px){
+    .promotion-block-padding {
+      padding: {{ extra_padding_mobile }};
+    }
+  }
+</style>
+{%else%}
+<style>
+  @media screen and (min-width:1181px){
+    .promotion-block-padding {
+      padding: {{ extra_padding }};
+    }
+  }
+  @media screen and (max-width:1180px){
+    .promotion-block-padding {
+      padding: {{ extra_padding_mobile }};
+    }
+  }
+  @media screen and (max-width:768px){
+    .single-block-{{section.id}}{
+      width:100%;
+    }
+  }
+  .second-block-padding {
+    padding-left: 30px;
+  }
+  @media screen and (max-width:1180px){
+    .second-block-padding {
+      padding-left: 15px;
+
+    }
+  }
+</style>
+{%endif%}
+
+{% schema %}
+{
+"name": "Newsletter with promotion",
+"max_blocks": 2,
+"class": "section-promotions",
+"settings": [
+{
+"type": "header",
+"content": "Newsletter signup and promotional space."
+},
+{
+"type": "select",
+"id": "block-width",
+"label": "Container width",
+"default": "split",
+"options": [
+{
+"value": "split",
+"label": "split"
+},
+{
+"value": "full-width",
+"label": "full-width"
+}
+]
+}
+],
+"blocks": [
+{
+"type": "newsletter",
+"name": "Newsletter",
+"limit": 2,
+"settings": [
+{
+"type": "text",
+"id": "title",
+"default": "Entice people to join your list",
+"label": "Heading"
+},
+{
+"type": "text",
+"id": "promotion-subheading_richtext",
+"default": "And then provide a little more information about what makes it so great.",
+"label": "Subheading"
+}
+]
+},
+{
+"type": "text",
+"name": "Promotion",
+"limit": 2,
+"settings": [
+{
+"type": "image_picker",
+"id": "promotions-img",
+"label": "Image",
+"info": "800 x 800px .png recommended"
+},
+{
+"type": "text",
+"id": "title",
+"label": "Title",
+"default": "Promotional space"
+},
+{
+"type": "text",
+"id": "featured-promotion-subtitle_richtext",
+"label": "Subheading",
+"default": "Show customers your most exciting offers."
+},
+{
+"type": "text",
+"id": "promo-btn-txt",
+"default": "Shop sales",
+"label": "Button label"
+},
+{
+"type": "url",
+"id": "promo-btn-link",
+"label": "Button link"
+}
+]
+}
+],
+"presets": [
+{
+"name": "Newsletter with promotion",
+"category": "Promotional",
+"blocks": [
+{
+"type": "newsletter"
+},
+{
+"type": "text"
+}
+]
+}]
+}
+{% endschema %}

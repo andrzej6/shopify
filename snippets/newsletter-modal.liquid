@@ -1,0 +1,67 @@
+<!-- NEWSLETTER MODAL BEGIN-->
+
+{% if settings.enable-home-newsletter-modal != blank%}
+<div class="tbm_modal-container">
+<div class="tbm_modal grid--full">
+<div class="grid__item three-fifths modal-title">
+
+  <h2>{{settings.tbm_cookie-modal-title | truncate:40}}</h2>
+  </div>
+  <div class="grid__item medium-up--one-half modal-content">
+ {{settings.tbm_cookie-modal-content | truncate:150 }}
+</div>
+<!--FORM-->
+<div class="grid__item medium-up--one-third modal-form ">
+{% form 'customer' %}
+{{ form.errors | default_errors }}
+{% if form.posted_successfully? %}
+           <p class="form--success">{{ 'general.newsletter_form.confirmation' | t }}</p>
+          {% else %}
+<div class="contact_form_inputs">
+<input type="email"
+value="{% if customer %}{{ customer.email }}{% endif %}"
+name="contact[email]"
+placeholder="{{ settings.tbm_cookie-modal-email-placeholder }}"
+id="Email"
+class="home"
+aria-label="{{ 'general.newsletter_form.newsletter_email' | t }}">
+
+  <span class="input-group-btn index">
+                <button type="submit" class="button newsletter__submit" name="subscribe" id="subscribe">
+                  <span class="newsletter__submit-text--large">{{ settings.tbm_cookie-modal-submit-text | truncate:20 }}</span>
+                </button>
+              </span>
+</div>
+{%endif%}
+{%endform%}
+<!--FORM ENDS-->
+</div>
+  <span class="tbm_modal-close">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" viewBox="0 0 16 15">
+      <path fill="currentColor" fill-rule="evenodd" d="M15 1.218L13.78 0 7.5 6.282 1.22 0 0 1.218 6.282 7.5 0 13.782 1.22 15 7.5 8.718 13.78 15 15 13.782 8.718 7.5"></path>
+    </svg>
+  </span>
+</div>
+<div class="tbm_modal-clear"></div>
+</div>
+<div class="tbm_modal-clickable"></div>
+</div>
+
+{%endif%}
+
+<script type="text/javascript">
+{%comment%}Variables referenced in theme.js.liquid{%endcomment%}
+{% if settings.enable-testing-mode %}
+var cookieExpireSet = -1;
+{% else %}
+var cookieExpireSet = 7;
+{%endif%}
+
+var cookieModalDelay = {{settings.tbm_cookie-modal-delay}};
+
+{% if settings.enable-testing-mode %}
+var cookieExpires = -1;
+{% else %}
+var cookieExpires = 7;
+{%endif%}
+</script>

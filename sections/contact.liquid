@@ -1,0 +1,97 @@
+<div class="grid--full">
+    {% if section.settings.image %}
+      {% if section.settings.image_height %}
+           <div>
+            {% assign img_url = section.settings.image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+            <img class="lazyload lazystretch"
+            src="{{ section.settings.image | img_url: '300x' }}"
+            data-src="{{ img_url }}"
+            data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+            data-aspectratio="{{ section.settings.image.aspect_ratio }}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            alt="{{ section.settings.image.alt }}">
+           </div>
+      {%else%}
+          <div class="collection-featured-image-{{ section.settings.page-image-height }} lazyload lazypreload"
+          data-bgset="{% include 'bgset', image: section.settings.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover" 
+          style="background-color: white; background-image: url({{ section.settings.image | img_url: '300x', format: 'pjpg' }});">
+          </div>
+      {%endif%}
+  {% endif %}
+
+  <div class="grid--full page-wrapper">
+      <div class="grid__item large--two-thirds push--large--one-sixth">
+
+    <h1 class="page-title">{{ page.title }}</h1>
+
+    {% comment %}
+    Regular page content goes here.
+    {% endcomment %}
+    <div class="rte">
+      {{ page.content }}
+    </div>
+
+    {% comment %}
+    Contact form starts here
+    {% endcomment %}
+    <div class="contact-us-page form-vertical">
+      {% form 'contact' %}
+
+      {% comment %}
+      Successful message
+      {% endcomment %}
+      {% if form.posted_successfully? %}
+      <p class="note form-success">
+        {{ 'contact.form.post_success' | t }}
+      </p>
+      {% endif %}
+      {{ form.errors | default_errors }}
+      {% assign name_attr = 'contact.form.name' | t | handle %}
+      <label for="ContactFormName" class="hidden-label">{{ 'contact.form.name' | t }}</label>
+      <input type="text" id="ContactFormName" class="input-full" name="contact[{{ name_attr }}]" placeholder="{{ 'contact.form.name' | t }}" autocapitalize="words" value="{% if form[name_attr] %}{{ form[name_attr] }}{% elsif customer %}{{ customer.name }}{% endif %}">
+      <label for="ContactFormEmail" class="hidden-label">{{ 'contact.form.email' | t }}</label>
+      <input type="email" id="ContactFormEmail" class="input-full" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+      {% assign name_attr = 'contact.form.phone' | t | handle %}
+      <label for="ContactFormPhone" class="hidden-label">{{ 'contact.form.phone' | t }}</label>
+      <input type="tel" id="ContactFormPhone" class="input-full" name="contact[{{ name_attr }}]" placeholder="{{ 'contact.form.phone' | t }}" pattern="[0-9\-]*" value="{% if form[name_attr] %}{{ form[name_attr] }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+      <label for="ContactFormMessage" class="hidden-label">{{ 'contact.form.message' | t }}</label>
+      <textarea rows="10" id="ContactFormMessage" class="input-full" name="contact[body]" placeholder="{{ 'contact.form.message' | t }}">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+      <input type="submit" class="btn right" value="{{ 'contact.form.send' | t }}">
+      {% endform %}
+    </div>
+  </div>
+  </div>
+</div>
+
+{% schema %}
+{
+"name": "Contact page",
+"settings": [
+{
+"type": "image_picker",
+"id": "image",
+"label": "Banner image",
+"info": "1920 x 400px .png recommended"
+},
+{
+"type": "checkbox",
+"id": "image_height",
+"label": "Use image height"
+},
+{
+"type":   "range",
+"id":     "page-image-height",
+"min":       300, 
+"max":       550,
+"step":      50,
+"unit":      "px",
+"label":     "Page banner height",
+"default":   350,
+"info": "Only works if image height setting above is unchecked"
+}
+]
+}
+{% endschema %}

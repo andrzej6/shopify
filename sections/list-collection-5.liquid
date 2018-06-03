@@ -1,0 +1,119 @@
+<!-- /templates/page.list-collections-5-products.liquid -->
+{% capture uses_minimal_framework %}{% include 'product-loop' %}{% endcapture %}
+{% assign grid_item_width = 'large--one-third medium--one-whole small--one-whole' %}
+{% assign image_size = 'large' %}
+{% if linklists[page.handle].links.size > 0 %}
+{% assign number_of_links = 0 %}
+{% for link in linklists[page.handle].links  %}
+{% if link.type == 'collection_link' %}
+
+{% comment %}
+If we have a collection link.
+{% endcomment %}
+{% assign collection = link.object %}
+{% assign number_of_links = number_of_links | plus: 1 %}
+
+<style>
+  .collection-product-featured-img,
+  .collection-product-img{
+    object-fit:{{section.settings.collection_cover}};
+  }
+</style>
+
+<div class="grid--full collections-height page-list-collection-featured ">
+  <div class="grid__item product-grid-item {{ grid_item_width }} text-center collection-grid-height">
+    <div class="content-class">
+      <div class="list-collections-content text-center list-collections-image lazyload" 
+          data-bgset="{% include 'bgset', image: collection.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover" 
+          style="background-image: url(https:{{ collection.image | img_url: '300x' }});">
+        <div class="collection-color-overlay"></div>
+        <div class="section-header collection-overlay">
+          <h2>{{ collection.title }}</h2>
+          <a href="{{ collection.url }}"> <button class="btn">{{'collections.general.view_collection' | t}}</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid__item large--two-thirds medium-down--one-whole collection-grid-height collection-products-container">
+    <div class="grid-full collection-product-wrapper">
+      {% if collection.products_count > 0 %}
+      {% for product in collection.products limit:2 %}
+      <div class="product-block">
+        {% include 'collection-grid-item' with "large--one-half" %}
+      </div>
+      {% endfor %}
+      {% for product in collection.products limit:3 offset:2 %}
+      <div class="product-block">
+        {% include 'collection-grid-item' with "large--one-quarter medium--one-half" %}
+      </div>
+      {% endfor %}
+      <a href="{{ collection.url }}" title="{{ 'collections.general.link_title' | t: title: collection_title }}" class="list-collections-ad">
+        <div class="grid__item {{ grid_item_width_b }} text-center collection-item-height {%if collection.products_count == 1%}ad-slot-2{%elsif collection.products_count >= 5%}ad-slot-6{%endif%}">
+          <div class="jim-test collection-list-viewCTA content-class" style="position: relative;">
+            <h2>{{'collections.general.view_all' | t}}</h2>
+          </div>
+        </div>
+      </a>
+      {%else%}
+      <div class="grid__item large--one-whole text-center collection-item-empty" style="height:100%; padding-right:0;">
+        <div class="jim-test content-class card-shadow" style="position: relative; background: #FFF;">
+          <h2 class="collection-link-last">Empty <br> Collection</h2>
+        </div>
+      </div>
+      {%endif%}
+    </div>
+  </div>
+  {% endif %}
+  <!-- end item -->
+  {% endfor %}
+
+  {% if number_of_links == 0 %}
+  <div class="grid__item large--one-whole text-center collection-item-empty page-wrapper">
+    <div class="jim-test content-class" style="position: relative; background: #FFF;">
+      <h2 class="collection-link-last"> There are no links of type <i>Collection</i> in your <b>{{ page.title }}</b> link list.
+        Go ahead and <a href="/admin/link_lists/{{ linklists[page.handle].id }}" target="_blank">edit your link list</a> to use links that point to collections.</h2>
+    </div>
+  </div>
+
+  {% endif %}
+
+  {% else %}
+  <div class="page-wrapper grid--full">
+    <div class="grid__item large--two-thirds push--large--one-sixth rte text-center">
+      <p>
+        You do not have a link list with a handle set to <kbd>{{ page.handle }}</kbd>, or you do and it's empty.
+        Go ahead and create a link list called <b>{{ page.title }}</b> on your <a href="/admin/links" target="_blank">Navigation page</a> and populate that link list with links that point to collections, to see collections listed here.
+        Make sure the link list also has a handle set to <kbd>{{ page.handle }}</kbd>.
+      </p>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+
+{% schema %}
+{
+"name": "5 Product Template",
+"settings": [
+{
+"type": "select",
+"id": "collection_cover",
+"label": "Image Scaling",
+"default": "cover",
+"options": [
+{
+"value": "cover",
+"label": "Cover"
+},
+{
+"value": "contain",
+"label": "Contain"
+}
+]
+}
+]
+}
+{% endschema %}

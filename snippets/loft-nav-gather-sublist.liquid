@@ -1,0 +1,6 @@
+{% for sublist_link in linklists[link_handle].links %}
+	{% assign sublist_handle = sublist_link.handle %}
+	{% if linklists[sublist_handle].links != blank %}
+		{% assign list_handles_str = list_handles_str | append:sublist_link.handle | append:'-btm/,' %}
+	{% endif %}
+{% endfor %}

@@ -1,0 +1,62 @@
+<div class="product-description" itemprop="description">
+
+    <ul class="tabs js-tabs-container">
+    {% if tab_1 != blank %}
+      <li>
+        <h4 class="product-h4">
+        {% if tab_2_content != blank or tab_3_content != blank %}
+          <a href="#tab-1" data-tab="1" class="active js-tabs-link">{{ tab_1 }}</a>
+          {% else %}
+          <div class="active js-tabs-link">{{ tab_1 }}</div>
+          {% endif %}
+        </h4>
+      </li>
+      {% endif %}
+      {% if tab_2_content != blank and tab_2 != blank and tab_1 != blank %}
+      <li>
+        <h4 class="product-h4">
+          <a href="#tab-2" data-tab="2" class="js-tabs-link">{{ tab_2 }}</a>
+        </h4>
+      </li>
+      {% endif %}
+      {% if tab_3_content != blank and tab_3 != blank and tab_1 != blank %}
+      <li>
+        <h4 class="product-h4">
+          <a href="#tab-3" data-tab="3" class="js-tabs-link">{{ tab_3 }}</a>
+        </h4>
+      </li>
+      {% endif %}
+   
+    </ul>
+   
+    <div class="tab-container js-tabs-content-container">
+      <div class="tab-content tab-1 current checkMyHeight js-tab-1">
+        <div class="rte">
+          <div class="description" itemprop="description">          
+            {{product.description}}        
+          </div>
+        </div>
+      </div>
+
+      {% if tab_2 != blank %}
+      <div id="tab-2" class="tab-content tab-2 js-tab-2">
+        <div class="rte">
+          <div class="description" itemprop="description">
+            {% capture tab2Content %}{{section.settings.tab_2_content}}{%endcapture%}
+            {{ pages[tab2Content].content }}
+          </div>
+        </div>
+      </div>
+      {%endif%}
+      {% if tab_3 != blank %}
+      <div id="tab-3" class="tab-content tab-3 js-tab-3">
+        <div class="rte">
+          <div class="description" itemprop="description">
+            {% capture tab3Content %}{{section.settings.tab_3_content}}{%endcapture%}
+            {{ pages[tab3Content].content }}
+          </div>
+        </div>
+      </div>
+      {%endif%}
+    </div>
+</div>

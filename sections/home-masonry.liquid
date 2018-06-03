@@ -1,0 +1,1288 @@
+<!-- Desktop Slideshow -->
+{% include 'image-style' %}
+{% for block in section.blocks %}
+
+    <style>
+      .slide{{ block.id }}{
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: {{block.settings.slide_image_h}} {{block.settings.slide_image_v}};
+      }
+      .slide{{ block.id }} .slider-overlay{
+        align-items: {{block.settings.slide_overlayH_pos}};
+        justify-content: {{block.settings.slide_overlayV_pos}};
+        padding:4%;
+        {%if block.settings.slide_overlayH_pos == 'flex-start' %}
+           text-align:left;
+        {% elsif block.settings.slide_overlayH_pos == 'center' %}
+           text-align:center;
+        {% elsif block.settings.slide_overlayH_pos == 'flex-end' %}
+           text-align:right;
+        {%endif%}
+        {% if block.settings.slide_overlayV_pos == 'flex-end'%}
+        padding-bottom:70px;
+        {%endif%}
+      }
+        {%if block.settings.slide_overlayH_pos == 'center'%}
+        .slide{{ block.id }}  .hero-subtitle {
+             padding: 0 10% 0 10%;
+          }
+        {%endif%}
+      
+      .block-ad-{{block.id}}{
+        background-color:{{block.settings.color_ad_background}};
+        color:{{block.settings.color_ad_text}};
+      }
+      .block-ad-{{block.id}} a{
+      color:{{block.settings.color_ad_link}};
+      }
+      .collection-image-{{block.id}} > a > img{
+        object-position: {{block.settings.collection_image_h}} {{block.settings.collection_image_v}};
+      }
+      .collection-image-{{block.id}}-mobile{
+        background-position:{{block.settings.collection_image_mobile_h}} {{block.settings.collection_image_mobile_v}};
+      }
+      .slider-overlay-color-{{ block.id }}{
+        background-color: {{ block.settings.slider-overlay-color }};
+        opacity: {{ block.settings.slider-overlay-opacity | times: 0.01 }};
+        height: 100%;
+        width: inherit;
+        position: absolute;
+        z-index: 1;
+      }
+      {%if block.settings.card_style == 'full'%}
+      .collection-content-{{block.id}}{
+        height:100% !important;
+
+      }
+      .collection-image-{{block.id}}.block-content-3,
+      .collection-image-{{block.id}}.block-content-2{
+        width:100%;
+      }
+      .collection-image-{{block.id}}.block-content-1{
+        position:absolute;
+      }
+      .block-content-1-copy.collection-content-{{block.id}},
+      .collection-image-{{block.id}} {
+        height:100% !important;
+      }
+      .collection-content-{{block.id}}{
+        height:100%;
+        z-index:100;
+        width:100%;
+        position:absolute;
+        opacity:0;
+        transition: all .5s ease-in-out;
+      }
+      .collection-overlay-full-{{block.id}}{
+        opacity:0;
+        transition: all .5s ease-in-out;
+        width:100%;
+        height:100%;
+        position:absolute;
+        top:0;
+        left:0;
+        z-index:1;
+        background-color: {{ block.settings.link-overlay-color }};
+      }
+      .masonry-section-{{section.id}}:hover .collection-overlay-full-{{block.id}}{
+        opacity: {{ block.settings.link-overlay | times: 0.01 }};
+      }
+      .masonry-section-{{section.id}}:hover .collection-content-{{block.id}}{
+        opacity:1;
+      }
+      .collection-content-{{block.id}} a, .collection-content-{{block.id}} .collection-grid-desc{
+        color: {{ block.settings.link-color }};
+      } 
+
+      {%endif%}
+    </style>
+    {% endfor %}
+    {%if section.settings.slideshow-height == 'image' and section.settings.hero-position == "above" %}
+    <style>
+
+    .masonry-slide-{{section.id}} .slick-slide{
+      height:auto !important;
+
+    }
+    .masonry-slide-{{section.id}} .slick-slide img{
+      width:100%;
+
+    }
+      .masonry-slide-{{section.id}}.sliderh{
+        height:100% !important;
+      }
+
+      @media screen and (max-width:480px){
+        .masonry-slide-{{section.id}} .slick-slide img{
+            min-height:400px;
+            object-fit:cover; 
+
+        }
+
+      }
+    </style>
+    {%endif%} 
+<div class="grid--full animated fadeIn" data-section-id="{{section.id}}" data-section-type="masonry">
+{%assign grid_blocks = 0%}
+
+{%for block in section.blocks%}
+{%if block.type == 'promotion' or block.type == 'content'%}
+{%- assign grid_blocks = grid_blocks | plus:1 -%}
+{%endif%}
+{%endfor%}
+
+{%- assign slides = 0 -%}
+{%- assign slides_present = 0 -%}
+      {% for block in section.blocks %}
+        {% if block.type == 'image' %}
+        {%- assign slides_present = slides_pesent | plus:1 -%}
+        {% endif %}
+      {% endfor %}
+     
+
+{% unless slides_present == 0 %}
+
+<div class=" masonry-slide-{{section.id}} grid__item {%if grid_blocks == 0 or section.settings.hero-position == "above"%}large--one-whole{%else%}large--two-fifths{%endif%} {% if section.settings.mobile_slideshow == 'hero' %} medium-down--hide {% else %} medium--one-whole small--one-whole {% endif %} two-fifths-width sliderh" {%if section.settings.hero-position == "above" or grid_blocks == 0 %}{%unless section.settings.slideshow-height == 'image'%}style="height:{{section.settings.slideshow-height}};"{%endunless%}{%endif%}>
+
+  <div class="slider-content-class card-shadow">
+    <div class="masonry-slider"   data-adapt="{%if section.settings.slideshow-height == 'image'%}true{%endif%}" data-auto="{{section.settings.autoplay}}" data-speed="{{ section.settings.autoplaySpeed | times: 1000 }}">
+      
+      {% for block in section.blocks %}
+
+      {% if block.type == 'image' %}
+      {%- assign slides = slides | plus:1 -%}
+      {% if section.settings.slideshow-height == 'image' and section.settings.hero-position == "above" %}
+            <div class="slide{{ block.id }} mobile-masonry-slide slide-full {% if forloop.index != 1 %}tb-slick-secondary{% endif %} {% if forloop.index == 1 %} tb-slick-first{% endif %}">
+            {% if block.settings.link and block.settings.button == '' %} <a href="{{block.settings.link}}" class="slide-tag">{%endif%}
+            {% if block.settings.image != blank %}
+              {% assign img_url = block.settings.image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ block.settings.image | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ block.settings.image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ block.settings.image.alt }}">
+
+            {%else%}
+              {{ "banner-placeholder.png" | asset_url | img_tag}}
+            {%endif%}
+      {%else%}
+        <div class="slide{{ block.id }} slide-full lazyload lazypreload {% if forloop.index == 1 %} tb-slick-first{% endif %}" 
+        {% if block.settings.image != blank %}
+        data-bgset="{% include 'bgset', image: block.settings.image %}"
+        data-sizes="auto"
+        data-parent-fit="cover"
+        style="background-image: url({{ block.settings.image | img_url: "300x300"}});" 
+        {% else %} 
+        style="background-image: url({{ "banner-placeholder.png" | asset_url }}); background-color: #e5e5e5; stroke: green;"
+        {% endif %} 
+        {{ block.shopify_attributes }}>
+      {%endif%}
+       <div class="slider-overlay animated fadeIn">
+        <div>
+          {% if block.settings.title != blank %}
+          <h1 class="{%if section.settings.slideshow-height contains "400" and section.settings.hero-position == "above"%}small-slide{%endif%} {{block.settings.copy_color}}">{{ block.settings.title | escape }}</h1>
+          {% endif %}
+          {% if block.settings.subheading_richtext != blank %}
+          <div class="h5 hero-subtitle {% if block.settings.button == '' %} no-bot-margin {%endif%} {%if section.settings.slideshow-height contains "400" and section.settings.hero-position == "above"%}small-slide{%endif%} {{block.settings.copy_color}}"><p>{{ block.settings.subheading_richtext }}</p></div>
+          {% endif %}
+          {% if block.settings.link and block.settings.button != '' %}
+          <a href="{{block.settings.link}}" class="{{block.settings.copy_color}} btn--tertiary">{{ block.settings.button }}</a>
+          {% endif %}
+        </div>
+        </div>
+         {% if block.settings.link and block.settings.button == '' %} </a>{%endif%}
+        <div class="slider-overlay-color-{{ block.id }}"></div>
+      </div>
+
+      {%endif%}
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+{% endunless %}
+
+<!-- Collections -->
+{%unless grid_blocks == 0%}
+<div class="grid__item {%if section.settings.hero-position == "above" or slides == 0 %} large--one-whole masonry-full collection-contains-{{grid_blocks}} {%else%}large--three-fifths{%endif%} medium--one-whole small--one-whole masonryh three-fifths-pad">
+  <div class="grid--full">
+    {% assign ad_count = 0 %}
+    {% assign collection_count = 0 %}
+
+    <div class="masonryh">
+
+      {% for block in section.blocks %}
+      {% case block.type %}
+      {% when 'promotion' %}
+      {% assign ad_count = ad_count | plus: 1 %}
+      {% when 'content' %}
+      {% assign collection_count = collection_count | plus: 1 %}
+      {% endcase %}
+      {% endfor %}
+
+      {% assign masonry_total_count = collection_count | plus: ad_count %}
+      {% case masonry_total_count %}
+
+      {% when 6 %}
+      {% assign grid_masonry_item_width = 'large--one-third' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m3 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m6 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m2 {
+          height:35%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          top:0;
+        }
+        .masonry-section-{{ section.id }}.content-class-m5 {
+          height:65%;
+          position: relative;
+          top: -15%;
+        }
+      </style>
+      {% when 5 %}
+      {% assign grid_masonry_item_width = 'large--one-third' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m2 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m3 {
+          height: 50%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          width:50%;
+          height: 50%;
+          top:0;
+        }
+        .masonry-section-{{ section.id }}.content-class-m5 {
+          width:50%;
+          height: 50%;
+          top:0;
+        }
+      </style>
+      {% when 4 %}
+      {% assign grid_masonry_item_width = 'large--one-half' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1,.masonry-section-{{ section.id }}.content-class-m2,.masonry-section-{{ section.id }}.content-class-m3,.masonry-section-{{ section.id }}.content-class-m4,.masonry-section-{{ section.id }}.content-class-m5,.masonry-section-{{ section.id }}.content-class-m6,.masonry-section-{{ section.id }} .collection-in-grid {
+          height: 50%;
+        }
+  
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          top: 0;
+        }
+      </style>
+      {% when 3 %}
+      {% assign grid_masonry_item_width = 'large--one-whole' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1,.masonry-section-{{ section.id }}.content-class-m2,.masonry-section-{{ section.id }}.content-class-m3,.masonry-section-{{ section.id }}.content-class-m4,.masonry-section-{{ section.id }}.content-class-m5,.masonry-section-{{ section.id }}.content-class-m6 {
+          height: 33.3%;
+        }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          top: 0;
+        }
+        .masonry-section-{{section.id}} .collection-in-grid{
+          height:initial;
+        }
+      </style>
+      {% when 2 %}
+      {% assign grid_masonry_item_width = 'large--one-whole' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1,.masonry-section-{{ section.id }}.content-class-m2,.masonry-section-{{ section.id }}.content-class-m3,.masonry-section-{{ section.id }}.content-class-m4,.masonry-section-{{ section.id }}.content-class-m5,.masonry-section-{{ section.id }}.content-class-m6 {
+          height: 50%;
+           {%if section.settings.hero-position == "above" or slides == 0 %} padding-left:0; {%endif%}
+        }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          top: 0;
+        }
+      </style>
+      {% when 1 %}
+      {% assign grid_masonry_item_width = 'large--one-whole' %}
+      <style>
+        .masonry-section-{{ section.id }}.content-class-m1,.masonry-section-{{ section.id }}.content-class-m2,.masonry-section-{{ section.id }}.content-class-m3,.masonry-section-{{ section.id }}.content-class-m4,.masonry-section-{{ section.id }}.content-class-m5,.masonry-section-{{ section.id }}.content-class-m6 {
+          height: 100%;
+         {%if section.settings.hero-position == "above" or slides == 0 %} padding-left:0;{%endif%}
+        }
+          .masonry-section-{{ section.id }} .collection-in-grid{
+            height:50%;
+          }
+        .masonry-section-{{ section.id }}.content-class-m4 {
+          top: 0;
+        }
+        .masonry-section-{{section.id}} .ad-slot-text p{
+          -webkit-line-clamp:10;
+        }
+      </style>
+      {% endcase %}
+
+
+      {% comment %}
+      We have {{ collection_count }} collections
+      We have {{ ad_count }} ads
+      {% endcomment %}
+      {% assign masonry_index = 0 %}
+      {% for block in section.blocks %}
+
+      {% case block.type %}
+      {% when 'promotion' %}
+      {% assign masonry_index = masonry_index | plus: 1 %}
+      <!-- Desktop Ad Slot -->
+      <div class="masonry-section-{{ section.id }} grid__item {{ grid_masonry_item_width }} three-fifths-width medium-down--hide {% cycle 'group1': 'content-class-m1', 'content-class-m2', 'content-class-m3', 'content-class-m4', 'content-class-m5', 'content-class-m6' %} ">
+          {% if block.settings.ad-link%}<a href="{{block.settings.ad-link}}">{%endif%}
+        <div class="card-shadow jim-card ad-slot-pad">
+           {% if block.settings.ad-image%}
+             {% assign img_url = block.settings.ad-image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+              <img class="lazyload"
+                    src="{{ block.settings.ad-image | img_url: '300x' }}"
+                    data-src="{{img_url}}"
+                    data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                    data-aspectratio="{{ block.settings[ad-image].aspect_ratio }}"
+                    data-sizes="auto"
+                    data-parent-fit="cover"
+                    alt="{{ link_title }}">
+              {%else%}
+          <div class="ad-slot-text block-ad-{{block.id}}"><p>{{ block.settings.ad_header }}</p></div>
+          {%endif%}
+        </div>
+         {%if block.settings.ad-link%}</a>{%endif%}
+      </div>
+
+
+
+
+      {% when 'content' %}
+      {% assign masonry_index = masonry_index | plus: 1 %}
+      {% assign link = block.settings.featured-link %}
+      {%- assign object_image = false-%}
+
+      {%- if link contains 'http' -%}
+      {%- assign link_title = block.settings.featured-link-title -%}
+      {%- assign object_description = nil -%}
+      {%- assign object = nil  -%}
+      {%- endif -%}
+
+      {%- if link contains 'collections' -%}
+      {%- assign collection_handle = block.settings.featured-link | remove: "/collections/" -%}
+      {%- assign object = collections[collection_handle] -%}
+      {%- assign link_title = object.title -%}
+      {%- assign object_image = object.image -%}
+      {%- assign object_description = object.description -%}
+      {%- endif -%}
+
+      {%- if link contains 'products' -%}
+      {%- assign product_handle = block.settings.featured-link | remove: "/products/" -%}
+      {%- assign object = all_products[product_handle] -%}
+      {%- assign link_title = object.title -%}
+      {%- assign object_image = object.featured_image -%}
+      {%- assign object_description = object.description -%}
+      {%- endif -%}
+
+      {%- if link contains 'pages' -%}
+      {%- assign page_handle = block.settings.featured-link | remove: "/pages/" -%}
+      {%- assign object = block.settings.featured-link | remove: "/pages/" -%}
+      {%- assign link_title = pages[object].title -%}
+      {%- assign object_description = pages[object].content -%}
+      {%- endif -%}
+
+      {%- if link contains 'blogs' -%}
+        {%- assign article_handle_raw = block.settings.featured-link | split: '/' -%}
+        {%- assign article_handle_partial = block.settings.featured-link | split: '/' | last -%}
+        {%- assign blog_test = link | remove: '/blogs/' -%}
+              {%- if article_handle_raw[3] -%}
+                {% comment %}
+                We have an article
+                {% endcomment %}
+                {%- assign article_handle = link | remove: '/blogs/' -%}
+                {%- assign object = articles[article_handle] -%}
+                {%- assign link_title = articles[article_handle].title -%}
+                {%- assign object_description = articles[article_handle].content -%}
+                {%- assign object_image = object.image -%}
+              {%- else -%}
+                {% comment %}
+                We have a category
+                {% endcomment %}
+                {%- assign object = blogs[article_handle_partial] -%}
+                {%- assign link_title = blogs[article_handle_partial].title -%}
+                {%- assign object_description = blogs[article_handle_partial].description -%}
+              {%- endif -%}
+      {%- endif -%}
+      {% unless block.settings.featured-link-title == blank %}
+      {% assign link_title = block.settings.featured-link-title %}
+      {% endunless %}
+
+
+      <div class="masonry-section-{{ section.id }} grid__item {{ grid_masonry_item_width }}  medium-down--hide noMansHide three-fifths-width  {%if object_image %}masonry-featured-collection-image{%endif%}  {% cycle 'group1': 'content-class-m1', 'content-class-m2', 'content-class-m3', 'content-class-m4', 'content-class-m5', 'content-class-m6' %}">
+        <div class="jim-card">
+          <div class="grid-pad {%if masonry_total_count < 4 and masonry_index == 2  %}collection-card-R{%endif%} card card-shadow {%if masonry_total_count <= 3 and masonry_total_count > 1 %}block-content-wrapper{%endif%}">
+            <div class="collection-overlay-full-{{block.id}}"></div>
+            <div class=" block-content-{{masonry_total_count }}  masonry-collection-target collection-image-{{block.id}}">
+              {% if link == blank %}
+              <a href="#">
+              {% unless block.settings.collection-image-override %}
+                {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg'}}
+              {% else %}
+                {% assign collection-image-override = block.settings.collection-image-override %}
+                {% include 'image-style' %}
+                  {% assign img_url = collection-image-override  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ collection-image-override | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ collection-image-override.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ link_title }}">
+
+              {% endunless %}
+              </a>
+              {% else %}
+              <a href="{{ link }}" title="{{ link_title }}">
+            {% unless block.settings.collection-image-override %}
+              {% if object_image %}
+                {%if masonry_total_count >= 4%}
+                {% assign img_url = object_image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ object_image | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ object_image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ link_title }}">
+
+                {%else%}
+                {% assign img_url = object_image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ object_image | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ object_image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ link_title }}">
+                {%endif%}
+              {% else %}
+                {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            {% else %}
+                {% assign collection-image-override = block.settings.collection-image-override %}
+                {% assign img_url = collection-image-override  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ collection-image-override | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ collection-image-override.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ link_title }}">
+            {% endunless %}
+              </a>
+              {% endif %}
+            </div>
+            <div class="collection-in-grid collection-content-{{block.id}} block-content-{{masonry_total_count }}-copy">
+              
+              {% if link == blank %}
+              <h2><a href="#">{{ 'Featured Content' }}</a></h2>
+              {% else %}
+              <h2><a href="{{ link }}" title="{{ link_title }}">{{ link_title }}</a></h2>
+              {% endif %}
+              {% if link.empty? %}
+              <div class="h3 collection-grid-desc">
+                {{ block.settings.masonry_richtext | strip_newlines }}
+              </div>
+              {% else %}
+
+              <div class="h3 collection-grid-desc">                  
+                {%if block.settings.masonry_richtext != ''%}
+                {{ block.settings.masonry_richtext | strip_newlines }}
+                {% else %}
+                {{ object_description | strip_newlines }}
+                {%endif%}              
+              </div>
+
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endcase %}
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+{%endunless%}
+</div>
+<!-- Mobile Section -->
+<div class="grid--full animated fadeIn large--hide">
+
+<!-- Mobile Hero -->    
+{% assign link_1 = section.settings.mobile_link1 | escape %}
+{% assign link_2 = section.settings.mobile_link2 %}
+{% assign link_3 = section.settings.mobile_link3 %}
+{% assign link_1_text = section.settings.mobile_link1_text | escape %}
+{% assign link_2_text = section.settings.mobile_link2_text | escape %}
+{% assign link_3_text = section.settings.mobile_link3_text | escape %}
+
+{% if section.settings.mobile_slideshow == 'hero' %}
+<div class="grid__item medium-down--show  large--hide medium--one-whole small--one-whole two-fifths-width sliderh">
+  <div class="slider-content-class card-shadow">
+    <div class="masonry-slider">
+      <div class="mobile-masonry-hero slide-full lazyload" 
+      {% if section.settings.mobile_masonry_hero != blank %}
+      data-bgset="{% include 'bgset', image: section.settings.mobile_masonry_hero %}"
+      data-sizes="auto"
+      data-parent-fit="cover"
+      style="background-image: url({{ section.settings.mobile_masonry_hero | img_url: "300x300"}});" 
+      {% else %}
+      style="background-image: url({{ "banner-placeholder.png" | asset_url }}); background-color: #e5e5e5; stroke: green;"
+      {% endif %}>
+
+        <div class="slider-overlay-hero animated fadeIn">
+          <h1 class="mobile-hero-h1 {{section.settings.mobile_copy_color}}" >{{ section.settings.title }}</h1>
+          {% if link_1 != blank or link_2 != blank or link_3 != blank %}
+          <ul>
+            {% if link_1 %}
+              <li class="mobile-hero-h3"><a href="{{ link_1 }}" class="mobile-hero-link  {{section.settings.mobile_copy_color}}">{{ link_1_text }}</a></li>
+            {% endif %}
+            {% if link_2 %}
+              <li class="mobile-hero-h3"><a href="{{ link_2 }}" class="mobile-hero-link  {{section.settings.mobile_copy_color}}">{{ link_2_text }}</a></li>
+            {% endif %}
+            {% if link_3 %}
+              <li class="mobile-hero-h3"><a href="{{ link_3 }}" class="mobile-hero-link  {{section.settings.mobile_copy_color}}">{{ link_3_text }}</a></li>
+            {%endif%}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{%if section.settings.mobile_header_enable %}
+<h2 class="text-center masonry-mobile-title">{{section.settings.mobile_header}}</h2>
+{%endif%}
+
+<div class="grid__item large--hide medium--one-whole small--one-whole masonryh  three-fifths-pad">
+  <div class="grid--full">
+    <div class="masonryh">
+      {% for block in section.blocks %}
+      {% if block.type == 'content' %}
+      {% assign masonry_index = masonry_index | plus: 1 %}
+      {% assign link = block.settings.featured-link %}
+       {%- assign object_image = false-%}
+
+
+      {%- if link contains 'http' -%}
+      {%- assign link_title = block.settings.featured-link-title -%}
+       {%- assign object_image = false-%}
+      {%- endif -%}
+
+      {%- if link contains 'collections' -%}
+      {%- assign collection_handle = block.settings.featured-link | remove: "/collections/" -%}
+      {%- assign object = collections[collection_handle] -%}
+      {%- assign link_title = object.title -%}
+      {%- assign object_image = object.image -%}
+      {%- assign object_description = object.description -%}
+      {%- endif -%}
+
+      {%- if link contains 'products' -%}
+      {%- assign product_handle = block.settings.featured-link | remove: "/products/" -%}
+      {%- assign object = all_products[product_handle] -%}
+      {%- assign link_title = object.title -%}
+      {%- assign object_image = object.featured_image -%}
+      {%- assign object_description = object.description -%}
+      {%- endif -%}
+
+      {%- if link contains 'pages' -%}
+      {%- assign page_handle = block.settings.featured-link | remove: "/pages/" -%}
+      {%- assign object = block.settings.featured-link | remove: "/pages/" -%}
+      {%- assign link_title = pages[object].title -%}
+      {%- assign object_description = pages[object].content -%}
+      {%- endif -%}
+
+      {%- if link contains 'blogs' -%}
+        {%- assign article_handle_raw = block.settings.featured-link | split: '/' -%}
+        {%- assign article_handle_partial = block.settings.featured-link | split: '/' | last -%}
+        {%- assign blog_test = link | remove: '/blogs/' -%}
+              {%- if article_handle_raw[3] -%}
+                {% comment %}
+                We have an article
+                {% endcomment %}
+                {%- assign article_handle = link | remove: '/blogs/' -%}
+                {%- assign object = articles[article_handle] -%}
+                {%- assign link_title = articles[article_handle].title -%}
+                {%- assign object_description = articles[article_handle].content -%}
+                {%- assign object_image = object -%}
+              {%- else -%}
+                {% comment %}
+                We have a category
+                {% endcomment %}
+                {%- assign object = blogs[article_handle_partial] -%}
+                {%- assign link_title = blogs[article_handle_partial].title -%}
+                {%- assign object_description = blogs[article_handle_partial].description -%}
+              {%- endif -%}
+      {%- endif -%}
+      {% unless block.settings.featured-link-title == blank %}
+      {% assign link_title = block.settings.featured-link-title %}
+      {% endunless %}
+      <!-- Mobile Collections Grid -->
+      <div class="grid__item large--hide medium-down--one-whole text-left home-reveal">
+        <div class=" card-shadow {% cycle 'mobile-collection-cards', 'mobile-collection-cards-reverse' %} {%if forloop.last%} mobile-collection-last-card{%endif%}">
+        <a class="mobile-card-link" href="{{ link }}" title="{{ link_title }}">
+        {% if link == blank %}
+          {% unless block.settings.collection-image-override %}
+            <div class="placeholder-collection">
+            {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+          {% else %}
+            {% assign collection-image-override = block.settings.collection-image-override %}
+            {% assign img_url = collection-image-override  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="lazyload"
+                      src="{{ collection-image-override | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ collection-image-override.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ collection.title }}">
+
+          {% endunless %}
+        {% else %}
+                {% unless block.settings.collection-image-override %}
+                    {% if object_image %}
+                    {% assign img_url = object_image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                    <img class="lazyload"
+                          src="{{ object_image | img_url: '300x' }}"
+                          data-src="{{ img_url }}"
+                          data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                          data-aspectratio="{{ object_image.aspect_ratio }}"
+                          data-sizes="auto"
+                          data-parent-fit="cover"
+                          alt="{{ collection.title }}">
+                    {% else %}
+                     {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+                {{ 'collection-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                    {% endif %}
+                {% else %}
+                {% assign collection-image-override = block.settings.collection-image-override %}
+                {% assign img_url = collection-image-override  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                  <img class="lazyload"
+                      src="{{ collection-image-override | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ collection-image-override.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ collection.title }}">
+                {% endunless %}    
+        {% endif %}
+                </a>
+              
+              <div class="mobile-collection-card-content">
+                {% if link == blank %}
+                <h2><a href="#">Featured Link</a></h2>
+                {% else %}
+                <h2><a href="{{ link }}" title="{{ link_title }}">{{ link_title }}</a></h2>
+                {% endif %}
+                <a href="{{ link }}" title="{{ link_title }}">
+                  <div class="h3 collection-grid-desc">
+                    {%if block.settings.masonry_richtext != ''%}
+                    {{ block.settings.masonry_richtext }}
+                    {%else%}
+                    {{ object_description | strip_html }}
+                    {%endif%}
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+          {%elsif block.type == 'promotion'%}
+          <div class="grid__item mobile-collection-cards-ad card-shadow large--hide home-reveal">
+            <div class="ad-slot-pad">
+            {% if block.settings.ad-image%}
+            {% if block.settings.ad-link%}<a href="{{block.settings.ad-link}}">{%endif%}
+            {% assign img_url = block.settings.ad-image  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+             <img class="lazyload"
+                      src="{{ block.settings.ad-image | img_url: '300x' }}"
+                      data-src="{{img_url}}"
+                      data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                      data-aspectratio="{{ block.settings.ad-image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-parent-fit="cover"
+                      alt="{{ block.settings.ad-image.alt }}">
+
+             {%if block.settings.ad-link%}</a>{%endif%}
+              {%else%}
+                  <div class="ad-slot-text block-ad-{{block.id}}">{{ block.settings.ad_header }}</div>
+                  {%endif%}
+            
+            </div>
+          </div>
+          {%endif%}
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  {% schema %}
+
+  {
+  "name": "Slideshow with promotions",
+  "class": "masonry-margin section-masonry",
+  "max_blocks" : 12,
+  "settings": [
+  {
+  "type": "header",
+  "content": "Desktop slideshow"
+  },
+  {
+  "type": "select",
+  "id": "hero-position",
+  "label": "Position",
+  "default": "beside",
+  "options": [
+  {
+  "value": "above",
+  "label": "Above"
+  },
+  {
+  "value": "beside",
+  "label": "Beside"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "slideshow-height",
+  "label": "Height",
+  "default": "960px",
+  "info" : "Only adjusts the height of the slideshow when it's positioned above the masonry grid",
+  "options": [
+  {
+  "value": "960px",
+  "label": "Large - 960px"
+  },
+  {
+  "value": "600px",
+  "label": "Medium - 600px"
+  },
+  {
+  "value": "400px",
+  "label": "Small - 400px"
+  },
+  {
+  "value": "image",
+  "label": "Image height"
+  }
+  ]
+  },
+   {
+  "type": "select",
+  "id": "autoplay",
+  "label": "Autoplay",
+  "default": "disable",
+  "options": [
+  {
+  "value": "enable",
+  "label": "Enable"
+  },
+  {
+  "value": "disable",
+  "label": "Disable"
+  }
+  ]
+  },
+{
+"type":   "range",
+"id":     "autoplaySpeed",
+"min":       4,
+"max":       10,
+"step":      1,
+"label":     "Autoplay speed in seconds",
+"default":   8
+},
+  {
+  "type": "header",
+  "content": "Mobile hero, visible on iPad and below."
+  },
+  {
+  "type": "select",
+  "id": "mobile_slideshow",
+  "label": "Mobile slide content",
+  "default": "slideshow",
+  "options": [
+  {
+  "value": "slideshow",
+  "label": "Display desktop slideshow"
+  },
+  {
+  "value": "hero",
+  "label": "Display mobile hero"
+  }
+  ]
+  },
+  {
+  "type": "image_picker",
+  "id": "mobile_masonry_hero",
+  "label": "Mobile hero image",
+  "info": "760 x 1250px .png recommended. Only visible if Mobile slide content is set to 'Display mobile hero'"
+  },
+  {
+  "type": "select",
+  "id": "mobile_copy_color",
+  "label": "Text color",
+  "default": "color-white",
+  "options": [
+  {
+  "value": "color-white",
+  "label": "White"
+  },
+  {
+  "value": "color-black",
+  "label": "Black"
+  }
+  ]
+  },
+  {
+  "type": "text",
+  "id": "title",
+  "label": "Mobile hero heading"
+  },
+  {
+  "type": "header",
+  "content": "Create up to 3 quick links for your mobile hero"
+  },
+  {
+  "type": "text",
+  "id": "mobile_link1_text",
+  "label": "Link heading",
+  "default": "Shop by room"
+  },
+  {
+  "type": "url",
+  "id": "mobile_link1",
+  "label": "Quick link #1"
+  },
+  {
+  "type": "text",
+  "id": "mobile_link2_text",
+  "label": "Link heading",
+  "default": "Learn about us"
+  },
+  {
+  "type": "url",
+  "id": "mobile_link2",
+  "label": "Quick link #2"
+  },
+  {
+  "type": "text",
+  "id": "mobile_link3_text",
+  "label": "Link heading",
+  "default": "or contact us."
+  },
+  {
+  "type": "url",
+  "id": "mobile_link3",
+  "label": "Quick link #3"
+  }
+  ],
+
+  "blocks": [
+  {
+  "type": "image",
+  "name": "Slide",
+  "limit": 6,
+  "settings": [
+  {
+  "type": "image_picker",
+  "id": "image",
+  "label": "Image",
+  "info": "700 x 900px .png recommended"
+  },
+  {
+  "type": "select",
+  "id": "slide_image_h",
+  "label": "Image horizontal position",
+  "default": "50%",
+  "info" : "Adjusts horizontal position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Left"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Right"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "slide_image_v",
+  "label": "Image vertical position",
+  "default": "50%",
+  "info" : "Adjusts vertical position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Top"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Bottom"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "copy_color",
+  "label": "Text color",
+  "default": "color-white",
+  "options": [
+  {
+  "value": "color-white",
+  "label": "White"
+  },
+  {
+  "value": "color-black",
+  "label": "Black"
+  }
+  ]
+  },
+  {
+  "type": "color",
+  "id": "slider-overlay-color",
+  "label": "Overlay color",
+  "default": "#ffffff"
+  },
+  {
+  "type":   "range",
+  "id":     "slider-overlay-opacity",
+  "min":       0,
+  "max":       90,
+  "step":      10,
+  "unit":       "%",
+  "label":     "Overlay opacity",
+  "default":   0
+  },
+  {
+  "type": "text",
+  "id": "title",
+  "label": "Heading",
+  "default": "Slideshow with promotions"
+  },
+  {
+  "type": "text",
+  "id": "subheading_richtext",
+  "label": "Subheading",
+  "default": "Tell your brand's story through images and text content."
+  },
+  {
+  "type": "text",
+  "id": "button",
+  "label": "Button label"
+  },
+  {
+  "type": "url",
+  "id": "link",
+  "label": "Slide link"
+  },
+  {
+  "type": "select",
+  "id": "slide_overlayV_pos",
+  "label": "Text vertical position",
+  "default": "center",
+  "info" : "Adjusts the vertical position of text on the slide overlay",
+  "options": [
+  {
+  "value": "flex-start",
+  "label": "Top"
+  },
+  {
+  "value": "center",
+  "label": "Center"
+  },
+  {
+  "value": "flex-end",
+  "label": "Bottom"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "slide_overlayH_pos",
+  "label": "Text horizontal position",
+  "default": "center",
+  "info" : "Adjusts the horizontal position of text on the slide overlay",
+  "options": [
+  {
+  "value": "flex-start",
+  "label": "Left"
+  },
+  {
+  "value": "center",
+  "label": "Center"
+  },
+  {
+  "value": "flex-end",
+  "label": "Right"
+  }
+  ]
+  }
+  ]
+  },
+  {
+  "type": "content",
+  "name": "Content",
+  "limit": 5,
+  "settings": [
+  {
+  "type": "url",
+  "label": "Content",
+  "id": "featured-link"
+  },
+    {
+  "type": "image_picker",
+  "id": "collection-image-override",
+  "label": "Card image",
+  "info": "If blank, link image is used (if available)"
+  },
+  {
+  "type": "select",
+  "id": "collection_image_h",
+  "label": "Image horizontal position",
+  "default": "50%",
+  "info" : "Adjusts horizontal position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Left"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Right"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "collection_image_v",
+  "label": "Image vertical position",
+  "default": "50%",
+  "info" : "Adjusts vertical position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Top"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Bottom"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "card_style",
+  "label": "Card style",
+  "default": "half",
+  "info" : "Text shows on hover when this is set to full image. Mobile won't be affected.",
+  "options": [
+  {
+  "value": "half",
+  "label": "Half and half"
+  },
+  {
+  "value": "full",
+  "label": "Full image"
+  }
+  ]
+  },
+  {
+  "type":   "range",
+  "id":     "link-overlay",
+  "min":       25,
+  "max":       100,
+  "step":      15,
+  "unit":       "%",
+  "label":     "Overlay opacity on hover for full image content",
+  "default":   25
+  },
+  {
+  "type": "color",
+  "id": "link-overlay-color",
+  "label": "Image overlay color",
+  "default": "#ffffff"
+  },
+  {
+  "type": "color",
+  "id": "link-color",
+  "label": "Overlay link color",
+  "default": "#000"
+  },
+  {
+  "type": "text",
+  "label": "Link heading",
+  "id": "featured-link-title"
+  },
+  {
+  "type": "richtext",
+  "label": "Richtext",
+  "id": "masonry_richtext",
+  "default": "<p>Share something exciting about your featured link.</p>",
+  "info": "If blank, collection description will be displayed. Note: In the six layout setup, the second (small middle) block will not output a description"
+  },
+  {
+  "type": "header",
+  "content": "Mobile"
+  },
+  {
+  "type": "select",
+  "id": "collection_image_mobile_h",
+  "label": "Image horizontal position",
+  "default": "50%",
+  "info" : "Adjusts horizontal position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Left"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Right"
+  }
+  ]
+  },
+  {
+  "type": "select",
+  "id": "collection_image_mobile_v",
+  "label": "Image vertical position",
+  "default": "50%",
+  "info" : "Adjusts vertical position",
+  "options": [
+  {
+  "value": "0%",
+  "label": "Top"
+  },
+  {
+  "value": "50%",
+  "label": "Center"
+  },
+  {
+  "value": "100%",
+  "label": "Bottom"
+  }
+  ]
+  }
+  ]
+  },
+  {
+  "type": "promotion",
+  "name": "Promotion",
+  "limit": 1,
+  "settings": [
+  {
+  "type": "text",
+  "label": "Heading",
+  "id": "ad_header",
+  "default":"The perfect place to display your top collection, or a store promotion.",
+  "info": "Limit to 140 characters for optimal display."
+  },
+  {
+  "type": "url",
+  "id":"ad-link",
+  "label": "Ad link"
+  },
+  {
+  "type": "color",
+  "id": "color_ad_text",
+  "label": "Text color",
+  "default": "#ffffff"
+  },
+  {
+  "type": "color",
+  "id": "color_ad_background",
+  "label": "Ad background color",
+  "default": "#292929",
+  "info": "The background color used in the ad space."
+  },
+  {
+  "type": "image_picker",
+  "id": "ad-image",
+  "label": "Use image for AD"
+  }
+  ]
+  }
+  ],
+  "presets": [{
+  "name": "Slideshow with promotions",
+  "category": "Promotional",
+  "blocks": [
+  {
+  "type": "image"
+  },
+  {
+  "type": "content"
+  },
+  {
+  "type": "promotion"
+  },
+  {
+  "type": "content"
+  },
+  {
+  "type": "content"
+  },
+  {
+  "type": "content"
+  },
+  {
+  "type": "content"
+  }
+  ]
+  }]
+  }
+  {% endschema %}

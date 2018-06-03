@@ -1,0 +1,118 @@
+<!-- Desktop Blog -->
+<div data-section-id="{{section.id}}" data-section-type="blog" class="home-reveal">
+<h2 class="mobile-header-space text-center large--hide">{{ 'homepage.sections.news_title' | t }}</h2>
+<div class="card-shadow">
+<div class="grid--full home-blog">
+  <div class="grid__item one-eighth medium-down--one-whole text-right home-blog-tags">
+    <div id="tabs-container" class="blog-tabs js-tabs-container">
+    <div class="home-blog-author medium-down--hide">{{section.settings.blog_links | truncate:30}}</div>
+    <ul class="blog-tabs">
+      {% for block in section.blocks %}
+      {% unless block.settings.homepage-blog == blank %}
+      {% assign blog_chosen = block.settings.homepage-blog %}
+      <li class="tab-link {% if forloop.first %}active{% endif %} js-tabs-link" data-tab="{{ forloop.index }}">
+        <p class="h4">{{ blogs[blog_chosen].title }}</p>
+      </li>
+      {% else %}
+      <li class="tab-link {% if forloop.first %}active{% endif %} js-tabs-link" data-tab="{{ forloop.index }}">
+        <p class="h4">Category {{ forloop.index }}</p>
+      </li>
+      {% endunless %}
+      {% endfor %}
+      {% if section.blocks.size == 0 %}
+      <li class="tab-link active js-tabs-link" data-tab="1">
+        <p class="h4">Featured Category</p>
+      </li>
+      {%endif%}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tab-contents" class="js-tabs-content-container">
+  {% for block in section.blocks %}
+{% assign blog_chosen = block.settings.homepage-blog %}
+    {% include 'home-blog-tab-content' %}
+  {% endfor %}
+  <!-- If section doesn't have any blocks, show placeholder -->
+  {% if section.blocks.size == 0 %}
+  <div class="tab-content {% if article_limit != 1 %}tab-padding seven-eighths{% endif %} grid__item four-fifths current">
+    <div class="grid__item three-quarters">
+      <a href="#"><h1 class="home-blog-text">First featured blog post</h1></a>
+      {% if  section.settings.homepage-blog-article-date %}
+    <div class="home-blog-author">Publish date</div>
+    {%endif%}
+      <div class="rte home-blog-text">
+        <p>This is your store’s blog. You can use it to talk about new product launches, experiences, tips or other news you want your customers to read about. Check out Shopify’s ecommerce blog for inspiration and advice... <br><br>The first 300 words of each featured blog are displayed here.</p>
+      </div>
+      <a class="h4 hvr-underline-from-left-dark" href="#">{{ 'blogs.article.read_more' | t }}</a>
+    </div>
+    <div class="grid__item one-quarter home-blog-image" style="background-image: url({{ 'placeholder-blog.png' | asset_url }});">
+    </div>
+  </div>
+  {%endif%}
+  </div>
+</div>
+</div>
+</div>
+
+
+
+
+{% schema %}
+{
+"name": "Blog posts",
+"class": "section-margin homepage-blog",
+"settings": [
+{
+  "type": "text",
+  "id": "blog_links",
+  "default": "Featured categories",
+  "label": "Heading"
+  },
+{
+"type": "checkbox",
+"id": "homepage-blog-article-date",
+"label": "Show date",
+"default": true
+}
+],
+"blocks": [
+{
+"type": "blog",
+"name": "Blog",
+"limit": 3,
+"settings": [
+{
+"type": "blog",
+"id": "homepage-blog",
+"label": "Featured blog"
+},
+{
+"type":   "range",
+"id":     "article_limit",
+"min":       1,
+"max":       3,
+"step":      1,
+"label":     "Articles to show",
+"default":   2
+}
+]
+}
+],
+"presets": [
+{
+"name": "Blog posts",
+"category": "Blog",
+"blocks": [
+{
+"type": "blog"
+},
+{
+"type": "blog"
+}
+]
+}
+]
+}
+{% endschema %}

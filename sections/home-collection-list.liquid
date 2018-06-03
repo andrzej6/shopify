@@ -1,0 +1,280 @@
+<!-- /sections/collection-list-->
+{%assign bCount = 0%}
+  {% for block in section.blocks %} 
+{%assign bCount = bCount | plus: 1%}
+{%endfor%}
+{%assign prow = section.settings.collection-column-width %}
+<style>
+  .collection-list-{{section.id}} .collection-color-overlay {
+    height: inherit;
+    background-color: {{section.settings.collection_overlay_color}};
+    opacity: {{section.settings.collection_overlay_opacity}};
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  @media screen and (min-width:769px){
+  .collection-list-{{section.id}}  .collection-grid-height{ 
+    padding-left:15px;
+ }
+{%if bCount == 0%}
+.collection-list-{{section.id}}  .collection-grid-height{
+   padding-right:0;
+
+}
+ .collection-list-{{section.id}}  .collection-grid-height:nth-child(2n+1){ 
+    padding-left:0;
+    padding-right:15px;
+}
+{%elsif prow == 'one-half'%}
+.collection-list-{{section.id}}  .collection-grid-height{
+   padding-right:0;
+
+}
+ .collection-list-{{section.id}}  .collection-grid-height:nth-child(2n+1){ 
+    padding-left:0;
+    padding-right:15px;
+}
+
+{%elsif prow == 'one-third'%}
+.collection-list-{{section.id}}  .collection-grid-height{
+   padding-right:15px;
+
+}
+ .collection-list-{{section.id}}  .collection-grid-height:nth-child(3n+1){ 
+    padding-left:0;
+    padding-right:15px;
+}
+.collection-list-{{section.id}}  .collection-grid-height:nth-child(3n+3){ 
+    padding-right:0;
+}
+{%elsif prow == 'one-quarter'%}
+.collection-list-{{section.id}}  .collection-grid-height{
+   padding-right:15px;
+
+}
+ .collection-list-{{section.id}}  .collection-grid-height:nth-child(4n+1){ 
+    padding-left:0;
+    padding-right:15px;
+}
+.collection-list-{{section.id}}  .collection-grid-height:nth-child(4n+4){ 
+    padding-right:0;
+}
+{%endif%}
+}
+
+@media screen and (max-width:768px) and (min-width:481px){
+  .collection-list-{{section.id}}  .collection-grid-height{ 
+    padding-left:7.5px;
+ }
+
+
+.collection-list-{{section.id}}  .collection-grid-height{
+   padding-right:0;
+
+}
+ .collection-list-{{section.id}}  .collection-grid-height:nth-child(2n+1){ 
+    padding-left:0 !important;
+    padding-right:7.5px;
+}
+}
+
+</style>
+ <h2 class="mobile-header-space instagram-title text-center">{{section.settings.heading}}</h2>
+<div class="grid--full homepage-collection-wrapper collections-height collection-list-{{section.id}}" id="collection-list-template" data-section-id="{{section.id}}" data-section-type="collection">
+
+  {%if bCount > 0 %}
+  {% for block in section.blocks %} 
+    {% if block.settings.selected-collection != blank %}
+      {% assign collection = collections[block.settings.selected-collection] %}
+      {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+      <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height section-margin  margin-B-M" >
+        <a href="{{ collection.url }}"></a>
+          <div class="content-class card-shadow">
+            {% if collection.image %}
+            <div class="list-collections-content collection-bg  text-center lazyload lazypreload"
+            data-bgset="{% include 'bgset', image: collection.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            style="background-image: url({{ collection.image | img_url: "300x300"}});" >
+              {% else %}
+              <div class="list-collections-content collection-bg  text-center lazyload lazypreload" 
+              data-bgset="{% include 'bgset', image: collection.products.first.featured_image  %}"
+              data-sizes="auto"
+              data-parent-fit="cover"
+              style="background-image: url({{ collection.products.first.featured_image | img_url: "300x300"}});">
+                {% endif %}
+                {%if section.settings.collection_title_background%}
+                <div class="collection-color-overlay"></div>
+                {%endif%}
+                {%if section.settings.collection_title%}
+                <div class="section-header collection-overlay">
+                  <h2>{{ collection_title }}</h2>
+                </div>
+                {%endif%}
+              </div>
+            </div>
+          </div>
+      
+      {% else %}
+        <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  section-margin  margin-B-M" >
+          <a href="{{ collection.url }}"></a>
+            <div class="content-class card-shadow">              
+              <div class="list-collections-content collection-bg collection-list-placeholder text-center">                
+                  {%if section.settings.collection_title_background%}
+                  <div class="collection-color-overlay"></div>
+                  {%endif%}
+                  {%if section.settings.collection_title%}
+                  <div class="section-header collection-overlay">
+                    <h2>Collection</h2>
+                  </div>
+                  {%endif%}
+                </div>
+              </div>
+            </div>
+        {% endif %}
+
+    {% endfor %}
+    {%else%}
+     <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  margin-B-M" >         
+            <div class="content-class card-shadow">              
+              <div class="list-collections-content collection-bg collection-list-placeholder text-center">                
+                  {%if section.settings.collection_title_background%}
+                  <div class="collection-color-overlay"></div>
+                  {%endif%}
+                  {%if section.settings.collection_title%}
+                  <div class="section-header collection-overlay">
+                    <h2>Collection</h2>
+                  </div>
+                  {%endif%}
+                </div>
+              </div>
+            </div>
+            <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  margin-B-M" >
+            <div class="content-class card-shadow">              
+              <div class="list-collections-content collection-bg collection-list-placeholder text-center">                
+                  {%if section.settings.collection_title_background%}
+                  <div class="collection-color-overlay"></div>
+                  {%endif%}
+                  {%if section.settings.collection_title%}
+                  <div class="section-header collection-overlay">
+                    <h2>Collection</h2>
+                  </div>
+                  {%endif%}
+                </div>
+              </div>
+            </div>
+    {%endif%}
+   </div>
+  {% schema %}
+  {
+  "name": "Collection list",
+  "class": "homepage-collection-list",
+  "settings": [
+  {
+  "type": "header",
+  "content": "Layout"
+  },
+  {
+  "type": "text",
+  "id":"heading",
+  "label": "Heading"
+  },
+  {
+  "type": "select",
+  "id": "collection-column-width",
+  "options": [
+  {
+  "value": "one-half",
+  "label": "2"
+  },
+  {
+  "value": "one-third",
+  "label": "3"
+  },
+  {
+  "value": "one-quarter",
+  "label": "4"
+  }
+  ],
+  "default": "one-half",
+  "label": "Collections per row"
+  },
+  {
+  "type": "header",
+  "content": "Visibility Options"
+  },
+  {
+  "type": "checkbox",
+  "id": "collection_title",
+  "label": "Show title",
+  "default": true
+  },
+  {
+  "type": "checkbox",
+  "id": "collection_title_background",
+  "label": "Show color overlay",
+  "default": true
+  },
+  {
+  "type": "color",
+  "id": "collection_overlay_color",
+  "label": "Overlay color",
+  "default": "#6e6e6e"
+  },
+  {
+  "type": "select",
+  "id": "collection_overlay_opacity",
+  "label": "Overlay opacity",
+  "default": "0.25",
+  "options": [
+  {
+  "value": "1",
+  "label": "100%"
+  },
+  {
+  "value": "0.65",
+  "label": "65%"
+  },
+  {
+  "value": "0.50",
+  "label": "50%"
+  },
+  {
+  "value": "0.25",
+  "label": "25%"
+  }
+  ]
+  }
+  ],
+  "blocks": [
+{
+"type": "Collection",
+"name": "Collection",
+"settings": [
+{
+  "type": "collection",
+  "id": "selected-collection",
+  "label": "Collection"
+}
+]
+}
+],
+ "presets": [
+{
+"name": "Collection list",
+"category": "Collection",
+"blocks": [
+  {
+  "type": "Collection"
+  },
+    {
+  "type": "Collection"
+  }
+]
+}
+]
+  }
+  {% endschema %}
+ 

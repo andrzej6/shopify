@@ -1,0 +1,42 @@
+{% comment %}
+/snippets/variant-qty-controls.liquid
+Include variables:
+    qtyMin: (optional) The minimum value that the quantity is allowed to be
+    quantity: (optional) The default value for the quantity
+
+Creates the plus, minus, and text inputs for controlling the quantity of the
+variant to be placed into the cart.
+
+NOTE: the id attribute is used by the theme's JavaScript, specifically in theme.Variants. 
+Do not adjust these attributes unless you also adjust it in the JavaScript code. Also, the
+JavaScript assumes that #quantity-container will ALWAYS be an ancestor to #quantity-minus,
+#quantity, and #quantity-plus.
+{% endcomment %}
+
+
+{% comment %} If qtyMin isn't set, set a default {% endcomment %}
+{% unless qtyMin %}
+{%- assign qtyMin = 0 -%}
+{% endunless %}
+{% comment %} If quantity is set, compare it to the min and max allowed value and adjust it accordingly {% endcomment %}
+{% if quantity %}
+    {% if quantity < qtyMin %}
+        {%- assign quantity = min -%}
+    {% endif %}
+{% endif %}
+
+{% comment %} Set the container class to the proper template {% endcomment %}
+{% if template contains 'cart' %}
+	{%- assign qtyClasses = 'quantity-wrapper' -%}
+{% else %}
+	{% if section.settings.show_quantity_selector %}
+		{%- assign qtyClasses = 'quantity-wrapper quantity-selector' -%}
+	{% else %}
+		{%- assign qtyClasses = 'product-hidden' -%}
+	{% endif %}
+{% endif %}
+<div id="quantity-container" class="{{qtyClasses}} js-qty-wrap">
+  <input id="quantity-minus" type='button' class='qtyminus' value='-' /> 
+  <input id="quantity" type="text" class="qty" {% if template contains 'cart' %}name="updates[]"{% else %}name="quantity"{% endif %} value="{% if quantity %}{{ quantity }}{% else %}1{% endif %}" min="{{ qtyMin }}" pattern="[0-9]*" >
+  <input id="quantity-plus" type='button' class='qtyplus' value='+' />
+</div>

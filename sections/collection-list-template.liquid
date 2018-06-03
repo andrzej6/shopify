@@ -1,0 +1,205 @@
+<!-- /sections/collection-list-template.liquid -->
+{% include 'image-style' %}
+<style>
+  .collection-color-overlay {
+    height: inherit;
+    background-color: {{section.settings.collection_overlay_color}};
+    opacity: {{section.settings.collection_overlay_opacity}};
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+</style>
+{% assign block-count = 0 %}
+{% for block in section.blocks %}
+{% assign block-count = block-count | plus: 1 %}
+{% endfor %}
+{%comment%}
+This page represents the /collections and /products pages.
+It is an optional, but highly recommended, template for your theme.
+More info:
+- http://docs.shopify.com/manual/configuration/store-customization/taking-control-of-collections-listing
+{%endcomment%}
+<div class="grid--full collections-height" id="collection-list-template">
+{% if block-count >= 1 %}
+  {% for block in section.blocks %}
+    {% if block.settings.selected-collection != blank %}
+      {% assign collection = collections[block.settings.selected-collection] %}
+      {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+      <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  margin-B-M" >
+        <a href="{{ collection.url }}">
+          <div class="content-class card-shadow">
+            {% if collection.image %}
+            <div class="list-collections-content collection-bg  text-center lazyload lazypreload"
+            data-bgset="{% include 'bgset', image: collection.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            style="background-image: url({{ collection.image | img_url: "300x300"}});" >
+              {% else %}
+              <div class="list-collections-content collection-bg  text-center lazyload lazypreload" 
+              data-bgset="{% include 'bgset', image: collection.products.first.featured_image  %}"
+              data-sizes="auto"
+              data-parent-fit="cover"
+              style="background-image: url({{ collection.products.first.featured_image | img_url: "300x300"}});">
+                {% endif %}
+                {%if section.settings.collection_title_background%}
+                <div class="collection-color-overlay"></div>
+                {%endif%}
+                {%if section.settings.collection_title%}
+                <div class="section-header collection-overlay">
+                  <h2>{{ collection_title }}</h2>
+                </div>
+                {%endif%}
+              </div>
+            </div>
+          </div>
+        </a>
+      {% else %}
+        <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  margin-B-M" >
+          <a href="{{ collection.url }}">
+            <div class="content-class card-shadow">
+              
+              <div class="list-collections-content collection-bg collection-list-placeholder text-center">
+                
+                  {%if section.settings.collection_title_background%}
+                  <div class="collection-color-overlay"></div>
+                  {%endif%}
+                  {%if section.settings.collection_title%}
+                  <div class="section-header collection-overlay">
+                    <h2>Collection</h2>
+                  </div>
+                  {%endif%}
+                </div>
+              </div>
+            </div>
+          </a>
+        {% endif %}
+  {% endfor %}
+{% else %}
+  {% for collection in collections %}
+  {% capture collection_title %}{{ collection.title | escape }}{% endcapture %}
+  {% if collection.products_count > 0 %}
+  <div class="grid__item {{section.settings.collection-column-width}} medium--one-half small--one-whole collection-grid-height  margin-B-M" >
+    <a href="{{ collection.url }}">
+      <div class="content-class card-shadow">
+        {% if collection.image %}
+        <div class="list-collections-content collection-bg  text-center lazyload lazypreload"
+            data-bgset="{% include 'bgset', image: collection.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            style="background-image: url({{ collection.image | img_url: "300x300"}});" >
+          {% else %}
+          <div class="list-collections-content collection-bg  text-center lazyload lazypreload" 
+              data-bgset="{% include 'bgset', image: collection.products.first.featured_image  %}"
+              data-sizes="auto"
+              data-parent-fit="cover"
+              style="background-image: url({{ collection.products.first.featured_image | img_url: "300x300"}});">
+            {% endif %}
+            {%if section.settings.collection_title_background%}
+            <div class="collection-color-overlay"></div>
+            {%endif%}
+            {%if section.settings.collection_title%}
+            <div class="section-header collection-overlay">
+              <h2>{{ collection_title }}</h2>
+            </div>
+            {%endif%}
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endif %}
+    {% endfor %}
+{% endif %}
+  </div>
+  {% schema %}
+  {
+  "name": "Collection list",
+  "settings": [
+  {
+  "type": "header",
+  "content": "Layout"
+  },
+  {
+  "type": "select",
+  "id": "collection-column-width",
+  "options": [
+  {
+  "value": "one-half",
+  "label": "2"
+  },
+  {
+  "value": "one-third",
+  "label": "3"
+  },
+  {
+  "value": "one-quarter",
+  "label": "4"
+  }
+  ],
+  "default": "one-quarter",
+  "label": "Collections per row"
+  },
+  {
+  "type": "header",
+  "content": "Visibility Options"
+  },
+  {
+  "type": "checkbox",
+  "id": "collection_title",
+  "label": "Show title",
+  "default": true
+  },
+  {
+  "type": "checkbox",
+  "id": "collection_title_background",
+  "label": "Show color overlay",
+  "default": true
+  },
+  {
+  "type": "color",
+  "id": "collection_overlay_color",
+  "label": "Overlay color",
+  "default": "#000"
+  },
+  {
+  "type": "select",
+  "id": "collection_overlay_opacity",
+  "label": "Overlay opacity",
+  "default": "0.65",
+  "options": [
+  {
+  "value": "1",
+  "label": "100%"
+  },
+  {
+  "value": "0.65",
+  "label": "65%"
+  },
+  {
+  "value": "0.50",
+  "label": "50%"
+  },
+  {
+  "value": "0.25",
+  "label": "25%"
+  }
+  ]
+  }
+  ],
+  "blocks": [
+{
+"type": "collection",
+"name": "Collection",
+"settings": [
+{
+  "type": "collection",
+  "id": "selected-collection",
+  "label": "Collection"
+}
+]
+}
+]
+  }
+  {% endschema %}
+ 

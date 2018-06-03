@@ -1,0 +1,148 @@
+<!-- /sections/home-featured-collection.liquid -->
+{% assign collection = collections[section.settings.collection] %}
+{% case section.settings.grid %}
+{% when 2 %}
+{% assign grid_item_width = 'medium--one-half large--one-half' %}
+{% when 3 %}
+{% assign grid_item_width = 'small--one-half medium--one-third large--one-third' %}
+{% when 4 %}
+{% assign grid_item_width = 'small--one-half medium--one-quarter large--one-quarter' %}
+{% when 5 %}
+{% assign grid_item_width = 'small--one-half medium-one-fifth large--one-fifth' %}
+{% endcase %}
+
+{% assign product_limit = section.settings.grid | times: section.settings.rows %}
+<div data-section-id="{{ section.id }}" data-section-type="featured-collection" >
+<div class="grid--full medium-down--hide section-background card-shadow home-reveal">
+  <div class="grid__item one-whole full-width {% if section.settings.title == blank %}homepage-featured-collection-title{% endif %} {% if section.settings.show_view_all != 'true' %} homepage-collection-margin {% endif %}">
+    {% assign collection = collections[section.settings.featured-collection] %}
+    {% if section.settings.title != blank %}
+    <a href="{{collections[section.settings.featured-collection].url}}"><h1 class="section-title">{{ section.settings.title | escape }}</h1></a>
+    {% endif %}
+    <div class="index-pgi">
+      {% for product in collection.products limit: product_limit %}
+      {% include 'product-grid-item' %}
+      {% else %}
+      {% for i in (1..product_limit) %}
+      <div class="grid__item {{ grid_item_width }} text-center grid-product-container">
+        <a href="#" class="grid__image">
+          {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+          {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg-center' }}
+        </a>
+        <p>
+          <a href="#">{{ 'homepage.onboarding.product_title' | t }}</a>
+        </p>
+        <div class="product-price-grid">19.99</div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  {% if section.settings.show_view_all %}
+  <div class="text-center">
+    <a href="{{collection.url}}" class="btn view-more-btn">{{ 'collections.general.view_all' | t }}</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Mobile Featured Collection -->
+<div class="grid--full card-shadow large--hide section-background mobile-featured-collection home-reveal">
+  <div class="grid__item one-whole full-width homepage-featured-collection-title {% if section.settings.show_view_all != 'true' %} homepage-collection-margin {% endif %}">
+
+    {% assign collection = collections[section.settings.featured-collection] %}
+    {% assign mobile_product_limit = section.settings.mobile-product-limit %}
+    {% if section.settings.title != blank %}
+    <a href="{{collections[section.settings.featured-collection].url}}"><h1 class="section-title">{{ section.settings.title | escape }}</h1></a>
+    {% endif %}
+    {% for product in collection.products %}
+    {%assign prodCount = forloop.length%}
+    {%endfor%}
+    <div class="index-pgi js-slides-container">
+      {% for product in collection.products limit: mobile_product_limit %}
+      <div>
+      {% include 'product-grid-item' %}
+      </div>
+      {% else %}
+      {% for i in (1..product_limit) %}
+      <div class="grid__item text-center grid-product-container">
+        <div class="grid-view-item">
+          <a href="#" class="grid-view-item__link">
+            <div class="grid-view-item__image">
+              {% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+              {{ 'product-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+            <div class="h4 grid-view-item__title">{{ 'homepage.onboarding.product_title' | t }}</div>
+            <div class="product-price-grid">19.99</div>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  {% if section.settings.show_view_all %}
+  <div class="text-center">
+    <a href="{{collection.url}}" class="btn view-more-btn">{{ 'collections.general.view_all' | t }}</a>
+  </div>
+  {% endif %}
+</div>
+</div>
+
+{% schema %}
+{
+"name": "Featured collection",
+"class": "section-margin section-featured-collection",
+"settings": [
+{
+"type": "text",
+"id": "title",
+"label": "Title",
+"default": "Featured collection"
+},
+{
+"id": "featured-collection",
+"type": "collection",
+"label": "Collection"
+},
+{
+"type":   "range",
+"id":     "mobile-product-limit",
+"min":       2,
+"max":       5,
+"step":      1,
+"label":     "Mobile product limit",
+"default":   4
+},
+{
+"type":   "range",
+"id":     "grid",
+"min":       2,
+"max":       5,
+"step":      1,
+"label":     "Products per row",
+"default":   4
+},
+{
+"type":   "range",
+"id":     "rows",
+"min":       1,
+"max":       5,
+"step":      1,
+"label":     "Rows",
+"default":   1
+},
+{
+"type": "checkbox",
+"id": "show_view_all",
+"label": "Show 'View all' button",
+"default": false
+}
+],
+"presets": [
+{
+"name": "Featured collection",
+"category": "Collection"
+}
+]
+}
+{% endschema %}

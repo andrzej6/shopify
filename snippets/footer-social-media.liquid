@@ -1,0 +1,72 @@
+{% assign icon_color = settings.color_footer_social_link %}
+{% assign icon_color_mobile = settings.color_footer_social_link_mobile %}
+<!-- Desktop Footer Social Icons -->
+<div class="footer-social-icons medium-down--one-whole large--show">
+   <ul class="inline-list social-icons">
+      {% if settings.social_twitter_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_twitter_link }}" title="{{ shop.name }} on Twitter" >
+         {% include 'tbm-icons', icon: 'twitter', icon_color: icon_color %}
+         <span class="fallback-text">Twitter</span>
+         </a>
+      </li>
+      {% endif %}
+      {% if settings.social_facebook_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_facebook_link }}" title="{{ shop.name }} on Facebook">
+         {% include 'tbm-icons', icon: 'facebook', icon_color: icon_color %}
+         <span class="fallback-text">Facebook</span>
+         </a>
+      </li>
+      {% endif %}
+      {% if settings.social_instagram_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_instagram_link }}" title="{{ shop.name }} on Instagram">
+         {% include 'tbm-icons', icon: 'instagram2', icon_color: icon_color_mobile %}
+         <span class="fallback-text">Instagram</span>
+         </a>
+      </li>
+      {% endif %}
+      {% if settings.social_google_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_google_link }}" title="{{ shop.name }} on Google+">
+         {% include 'tbm-icons', icon: 'google-plus', icon_color: icon_color %}
+         <span class="fallback-text">Google+</span>
+         </a>
+      </li>
+      {% endif %}
+      {% if settings.social_youtube_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_youtube_link }}" title="{{ shop.name }} on YouTube">
+         {% include 'tbm-icons', icon: 'youtube', icon_color: icon_color %}
+         <span class="fallback-text">YouTube</span>
+         </a>
+      </li>
+      {% endif %}
+      {% if settings.social_pinterest_link != blank %}
+      <li>
+         <a class="icon-fallback-text" href="{{ settings.social_pinterest_link }}" title="{{ shop.name }} on Pinterest">
+         {% include 'tbm-icons', icon: 'pinterest', icon_color: icon_color %}
+         <span class="fallback-text">Pinterest</span>
+         </a>
+      </li>
+      {% endif %}
+   </ul>
+   {% if section.settings.footer_payments_enable %}
+   {% unless shop.enabled_payment_types == empty %}
+   {% assign payment_icons_available = 'amazon_payments,american_express,bitcoin,cirrus,dankort,diners_club,discover,dogecoin,dwolla,forbrugsforeningen,interac,jcb,litecoin,maestro,master,paypal,visa' | split: ',' %}
+   <ul class="inline-list payment-icons">
+      {% for type in shop.enabled_payment_types %}
+      {% if payment_icons_available contains type %}
+      <li>
+         <span class="icon-fallback-text">
+         <span class="icon icon-{{type}}" aria-hidden="true"></span>
+         <span class="fallback-text">{{ type | replace: '_',' '}}</span>
+         </span>
+      </li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+   {% endunless %}
+   {% endif %}
+</div>

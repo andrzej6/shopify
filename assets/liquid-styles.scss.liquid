@@ -1,0 +1,86 @@
+{% if template == 'index' %}
+div#shopify-section-home-featured-collection {
+  margin: 15px;
+}
+@media (max-width: 768px){
+  div#shopify-section-home-featured-collection {margin: 0px 0px 15px 0px;}
+
+}
+{% elsif template contains 'collection' %}
+.wrapper{
+  max-width: initial;
+}
+.grid--full:after{
+  content:initial !important;
+}
+{% elsif template contains 'customers' %}
+.main-content {  
+  background-color: white;
+  margin-bottom: 4%;
+  padding:70px 15px 30px 15px;
+
+}
+{% elsif template contains 'product' %} 
+.main-content {
+  @media screen and (min-width:769px){
+    padding:15px 15px 30px 15px; 
+  }
+}
+{%endif%}
+
+{% if settings.button_styles == "round" %}
+@mixin btn-style-rounded {
+	text-transform: capitalize !important;
+	font-size: 18px !important;
+	font-weight: 500 !important;	
+}
+button.nav-button {
+	border-radius: 10px !important;
+	@include btn-style-rounded;
+}
+.search-dropdown.searching .search-input-submit .banner button {
+	@include btn-style-rounded;
+}
+input#Email.input-group-field.home {
+	border-radius: 10px;
+}
+input#subscribe.btn.home {
+	border-radius: 10px;
+}
+.add-to-cart-btn span{
+  padding: 8px 25px;
+  border-radius:10px;
+  @include btn-style-rounded;
+}
+.grid__item {
+	&:nth-child(1) .top-button-inner,
+	&:nth-child(2) .top-button-inner {
+		border-radius: 10px;
+	}
+}
+.cart-continue-button, .cart-submit-button{
+	@include btn-style-rounded;
+}
+.cart-top-buttons {
+	.top-cart-total span {
+		padding: 8px 25px;
+	  border-radius: 10px;
+	  line-height:1.1;
+	  @include btn-style-rounded;
+	}
+	.top-cart-checkout #AddToCartText{  
+    line-height:0;
+	  @include btn-style-rounded;
+  }
+}
+button#AddToCart-product-template {
+	padding: 7px 0 5px!important;
+}
+@media screen and (max-width:768px) {
+	.mobile-blog-button h4 {
+		text-transform: capitalize!important;
+    font-size: 18px!important;
+    font-weight: 500!important;
+	}
+}
+{% endif %}

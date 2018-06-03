@@ -1,0 +1,362 @@
+<!-- /templates/search.liquid -->
+{% include 'image-style' %}
+{% comment %}
+
+To return only products or pages in results:
+- http://docs.shopify.com/manual/configuration/store-customization/return-only-product-in-storefront-search-results
+- Or manually add type=product or type=page to the search URL as a parameter
+
+{% endcomment %}
+
+{% assign grid_results = false %}
+{%unless section.settings.search_layout == "one-whole"%}
+{% assign grid_results = true %}
+{%endunless%}
+
+{% comment %}
+Check to enforce respond.js
+{% endcomment %}
+{% assign respond_js_secret_key = shop.domain | md5 %}
+{% unless search.terms == respond_js_secret_key %}
+
+{% comment %}
+Avoid accessing search.results before the opening paginate tag.
+If you do, the pagination of results will be broken.
+{% endcomment %}
+{% paginate search.results by section.settings.search-result-paginate %}
+
+<div class="grid--full" id="search-page-template" data-section-id="{{section.id}}" data-section-type="search-template">
+  <div class="grid__item large--one-whole">
+    <div class="search-form">
+      {% assign nice_terms = search.terms | replace:'**', '' | replace: '??', '' | replace: 'vendor:', 'from ' | replace: 'product_type:', 'in ' %}
+      {% if search.performed %}
+        {% if search.results == empty %}
+          <h1 class="text-center">{{ 'general.search.no_results_html' | t: terms: nice_terms }}</h1>
+        {% else %}
+          <h1 class="text-center">{{ 'general.search.results_for_html' | t: terms: nice_terms }}</h1>
+        {% endif %}
+      {% else %}
+        <h1 class="text-center">{{ 'general.search.title' | t }}</h1>
+      {% endif %}
+      {% include 'search-bar' %}
+    </div>
+
+    {% if search.performed and search.results != empty %}
+
+    <div {%if grid_results %}class="grid--full grid-uniform one-whole grid-column-wrapper"{%endif%}>
+      {% for item in search.results %}
+      {% comment %}
+      Check if the product is on sale and set a variable to be used below.
+      {% endcomment %}
+      {% assign on_sale = false %}
+      {% if item.compare_at_price_varies %}
+        {% assign on_sale = true %}
+      {% endif %}
+
+      {% comment %} 
+      Check if the product is sold out and set a variable to be used below.
+      {% endcomment %}
+      {% assign sold_out = true %}
+      {% if item.available or item.object_type == 'article'%}
+        {% assign sold_out = false %}
+      {% endif %}
+
+      {% if grid_results == false %}
+      <!-- begin list search results-->
+
+      <div class="grid__item search-product-card">
+
+        <div class="grid--full search-list-layout search-product-wrapper {%if sold_out %} unavailable {%endif%}">
+          <div class="grid__item large--one-half medium--one-whole search-product-image grid-product-container">
+            <div class="ptest">
+              {% comment %}<div id="relproduct-dummy"></div>{% endcomment %}
+              <a href="{{ product.url | within: collection }}">
+                <div  {%if sold_out%}class="unavailable"{%endif%}>
+
+                {% assign img_url = item.featured_image.src  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+
+              <img class="itest lazyload"
+               src="{{ item.featured_image.src | img_url: '300x' }}"
+               data-src="{{ img_url }}" 
+               data-widths="[250,360,540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]" 
+               data-aspectratio="{{ item.featured_image.src.aspect_ratio }}" 
+               data-sizes="auto"  
+               data-parent-fit="cover" 
+               alt="{{ item.featured_image.alt | escape }}">
+
+
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="grid__item large--one-half medium--one-whole search-product-content text-center">
+            <h2>{{ item.title | link_to: item.url }}</h2>
+
+            {% if item.price %}
+            <p>
+              {% if on_sale %}
+              {% if item.price_varies %}
+              {% assign sale_price = item.price | money %}
+              <span itemprop="price">{{ 'products.product.on_sale_from_html' | t: price: sale_price }}</span>
+
+              {% else %}
+              <span itemprop="price">{{ item.price | money }}</span>
+              {% endif %}
+              {% else %}
+              {% if item.price_varies %}
+              {% assign price = item.price | money %}
+              {{ 'products.general.from_text_html' | t: price: price }}
+              {% else %}
+              <span itemprop="price">{{ item.price | money }}</span>
+              {% endif %}
+              {%endif%}
+
+            </p>
+            {% endif %}
+
+            {% comment %}
+            Get a brief excerpt of raw text from the page/product
+            {% endcomment %}
+            <p>{{ item.content | strip_html | truncatewords: 50 }}</p>
+                    {% assign product = item %}
+
+            {% if settings.use_swatches %}
+                 {% for option in item.options %}
+                      {%if option == 'Color'%}
+                        {% include 'swatch' with option, total:0, collPage: true %}
+                     {%endif%}
+                 {%endfor%}
+           {%endif%}
+             {%if settings.enable_quick%}
+            <a data-fancybox data-type="ajax" data-src="{{shop.url}}{{item.url}}" data-filter="#quick" href="javascript:;" class="quick-view">
+              {{'products.general.quick_view' | t }}
+            </a>
+            {%endif%}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- list search results-->
+      {% else %}
+
+      <!-- begin grid search results-->
+      <div class="grid__item {%if sold_out %} unavailable {%endif%}search-result {%if section.settings.search_layout != "one-whole"%} search-product-wrapper-square{%endif%} large--{{section.settings.search_layout}} medium-down--one-whole text-center grid-product-container-search">
+        <div class="ptest">
+    <a href="{{ item.url }}">
+      <div  {%if sold_out%}class="unavailable"{%endif%}>
+        {% if item.object_type == "article"%}
+            {% if item.image.src %}    
+
+            {% assign img_url = item.image.src  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+
+    
+
+               <img class="itest lazyload"
+                  src="{{ item.image.src | img_url: '300x' }}"
+                  data-src="{{ img_url }}" 
+                  data-widths="[250,360,540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]" 
+                  data-aspectratio="{{ item.image.src.aspect_ratio }}" 
+                  data-sizes="auto"  
+                  data-parent-fit="cover" 
+                  alt="{{ item.image.alt | escape }}">
+
+            {% else %}         
+               {% if item.content contains "<img" %}
+                  {% assign src = item.content | split: 'src="' %}
+                  {% assign src = src[1] | split: '"' | first | replace: '//cdn', 'http://cdn' | replace: 'http:http://', 'http://' | remove: 'https:' %}
+
+                
+                  {%if src contains "_medium"%}
+                  {% assign img_url =  src | replace: '_medium.', '_{width}x.' %}
+                  {% assign src_small =  src | replace: '_medium.', '_300x300.' %}
+
+                  {%elsif src contains "_large"%}
+                  {% assign img_url =  src | replace: '_large.', '_{width}x.' %}
+                  {% assign src_small =  src | replace: '_large.', '_300x300.' %}
+
+                  {%elsif src contains "_grande"%}
+                  {% assign img_url =  src | replace: '_grande.', '_{width}x.' %}
+                  {% assign src_small =  src | replace: '_grande.', '_300x300.' %}
+
+                  {%elsif src contains "_1024x1024"%}
+                  {% assign img_url =  src | replace: '_1024x1024.', '_{width}x.' %}
+                  {% assign src_small =  src | replace: '_1024x2024', '_300x300.' %}
+
+                  {%elsif src contains "_2048x2048"%}
+                  {% assign img_url =  src | replace: '_2048x2048.', '_{width}x.' %}
+                  {% assign src_small =  src | replace: '_2048x2048.', '_300x300.' %}
+                  {%endif%}
+
+                 <img class="itest lazyload"
+                    src="{{ src_small | format:'.jpg' }}"
+                    data-src="{{ img_url | format:'.jpg'}}" 
+                    data-widths="[250,360,540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]" 
+                    data-aspectratio="{{ src.aspect_ratio }}" 
+                    data-sizes="auto"  
+                    data-parent-fit="cover" 
+                    alt="{{ src.alt | escape }}">
+
+
+               {% endif %}
+            {% endif %}
+
+        {%else%}
+
+      {% assign img_url = item.featured_image.src  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+
+              <img class="itest lazyload"
+               src="{{ item.featured_image.src | img_url: '300x' }}"
+               data-src="{{ img_url }}" 
+               data-widths="[250,360,540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]" 
+               data-aspectratio="{{ item.featured_image.src.aspect_ratio }}" 
+               data-sizes="auto"  
+               data-parent-fit="cover" 
+               alt="{{ item.featured_image.alt | escape }}">
+
+
+
+        {%endif%}        
+      </div>
+    </a>
+  </div>
+        <p> {{ item.title | link_to: item.url }}</p>
+
+        {% if item.price %}
+        <div class="product-price-grid">
+          {%if on_sale and sold_out != true%}
+          <div class="on-sale">
+            {% include 'tbm-icons', icon: 'sale' %}
+          </div>
+          {%elsif sold_out and on_sale != true%}
+          <div class="sold-out sold-out-search">
+            {% include 'tbm-icons', icon: 'soldout'%}
+          </div>
+          {%elsif on_sale and sold_out%}
+          <div class="sold-out sold-out-search">
+            {% include 'tbm-icons', icon: 'soldout'%}
+          </div>
+
+          {%endif%}
+          {% if on_sale %}
+          {% if item.price_varies %}
+          {% assign sale_price = item.price | money %}
+          <span itemprop="price">{{ 'products.product.on_sale_from_html' | t: price: sale_price }}</span>
+
+          {% else %}
+          <span itemprop="price">{{ item.price | money }}</span>
+          {% endif %}
+          {% else %}
+          {% if item.price_varies %}
+          {% assign price = item.price | money %}
+          {{ 'products.general.from_text_html' | t: price: price }}
+          {% else %}
+          <span itemprop="price">{{ item.price | money }}</span>
+          {% endif %}
+          {%endif%}
+
+        </div>
+        {% else %}
+        <p>{{ item.content | strip_html | truncatewords: 30 }}</p>
+        {% endif %}
+               {% assign product = item %}
+        {% if settings.use_swatches %}
+         {% for option in item.options %}
+                {%if option == 'Color'%}
+               {% include 'swatch' with option, total:0, collPage: true %}
+               {%endif%}
+         {%endfor%}
+        {%endif%}
+    {%if settings.enable_quick and item.object_type != 'article'%}
+    <a data-fancybox data-type="ajax" data-src="{{shop.url}}{{item.url}}" data-filter="#quick" href="javascript:;" class="quick-view">
+      {{'products.general.quick_view' | t }}
+    </a>
+    {%endif%}
+
+      </div>
+      <!-- //grid search results-->
+      {% endif %}
+
+      {% endfor %}
+    </div>
+
+    {% if paginate.pages > 1 %}
+    <hr>
+    <div class="pagination">
+      {{ paginate | default_pagination | replace: '&laquo; Previous', '&larr;' | replace: 'Next &raquo;', '&rarr;' }}
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+  </div>
+</div>
+
+{% endpaginate %}
+
+{% else %}
+{% include 'respond' %}
+{% layout none %}
+{% endunless %}
+
+{% schema %}
+{
+"name": "Search page",
+"class": "section-search-template",
+"settings": [
+{
+"type": "header",
+"content": "Layout"
+},
+{
+"type": "select",
+"id": "search_layout",
+"label": "Results per row",
+"default": "one-whole",
+"options": [
+{
+"value": "one-whole",
+"label": "1"
+},
+{
+"value": "one-half",
+"label": "2"
+},
+{
+"value": "one-third",
+"label": "3"
+},
+{
+"value": "one-quarter",
+"label": "4"
+}
+]
+},
+{
+"type": "select",
+"id": "search-result-paginate",
+"label": "Results per page",
+"default": "12",
+"options": [
+{
+"value": "2",
+"label": "2"
+},
+{
+"value": "12",
+"label": "12"
+},
+{
+"value": "24",
+"label": "24"
+},
+{
+"value": "48",
+"label": "48"
+}
+]
+}
+]
+}
+{% endschema %}

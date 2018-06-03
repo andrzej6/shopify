@@ -1,0 +1,791 @@
+<!-- /sections/header.liquid -->
+{%assign overlay_color = section.settings.mega-nav-overlay-color%}
+{%assign overlay_opacity = section.settings.mega-nav-overlay-opacity | times: 0.01 %}
+{% assign logo_location = section.settings.logo-location %}
+<style>
+.header-logo a.site-header__logo-image{
+  width:{{section.settings.logo_max_width}}px;
+  height:100%;
+}
+@media screen and (max-width:998px){
+.header-logo .site-header__logo-{{ logo-location }} a{
+  max-width:200px;
+}
+}
+
+{%unless section.settings.advanced_search%}
+.search-dropdown{
+  min-height: initial !important;
+  height: 150px;
+}
+{%endunless%}
+
+.site-header{
+  align-items: initial;
+  align-content: inherit;
+{%if section.settings.promo-text != blank%}
+  min-height:100px;
+  {%else%}  
+  min-height:70px;
+{%endif%}
+{% if section.settings.header_position %}
+  position:fixed;
+{%else%}
+  position:relative;
+{%endif%}
+}
+
+{%if section.settings.mega_ad_image%}  
+.site-header .nav-section-ad{
+  padding:0;
+  display:block;
+}
+.nav-section-ad > div{
+  width:100%;
+  height:100%;
+}
+{%endif%}
+
+{%if section.settings.header_position%}
+.site-nav__link{
+padding:5px 10px;
+}
+{%else%}
+.site-nav__link{
+padding:10px 10px;
+}
+{%endif%}
+
+@media screen and (min-width:769px){ 
+ {%if section.settings.header_position != true%}
+.site-header.static-padding{
+  padding-top:0;
+}
+.promo-bar{
+  margin-bottom:5px;
+}
+{%else%}
+  .main-content{
+  {%if section.settings.promo-text != blank%}
+  margin-top:100px;
+  {%else%}
+  margin-top:70px;
+  {%endif%}
+}
+
+{%endif%}
+}
+
+{%if section.settings.promo_enable and section.settings.promo-text != blank%}
+    {%if section.settings.mobile_nav_location == 'top'%}
+      @media screen and (max-width:768px){
+             .sticky-header {
+                bottom: 15px;
+                top: inherit;
+              }
+              .sticky-header.search-is-open{
+                bottom:0;
+              }
+              .sticky-footer { 
+                top: 30px;
+              }
+              .cart-top-buttons{
+                top: 15%;
+              }
+      }
+       @media screen and (max-width: 414px){
+            .sticky-footer { 
+              top: 30px;
+            }
+           
+            .cart-top-buttons{
+              top: 15%;
+            }
+        }
+
+     {%else%} 
+
+     @media screen and (max-width:768px){
+              
+             .template-product .product-top-buttons.grid--full{
+              padding-top:45px;
+
+             }
+             .cart-top-buttons{
+              top:30px;
+             }
+          
+            .sticky-header{
+              top:25px;
+            }
+            .sticky-header.search-is-open{
+              top:0;
+            }
+
+      }
+
+    {%endif%}
+{%endif%}
+
+{% if section.settings.navigation_account_enable or section.settings.navigation_social_enable %}
+.mobile-nav__link-group {
+  height: calc(100% - 190px);
+}
+{% else %}
+.mobile-nav__link-group {
+  height: 90%;
+}
+{% endif %}
+
+{%if section.settings.promo_enable == false%}
+  {%if section.settings.mobile_nav_location == 'top'%}
+   @media screen and (max-width: 768px){
+    .sticky-header {
+      bottom: 15px;
+      top: inherit;
+   }
+   .sticky-header.search-is-open{
+     bottom:0;
+   }
+    
+    .sticky-footer { 
+      top: 0;
+    }
+    .cart-top-buttons{
+      top: 12%;
+    }
+  } 
+  
+  @media screen and (max-width: 414px){
+    .main-content {
+      margin-top: 17%;
+    }
+    
+    .sticky-footer { 
+      top: 0;
+    }
+    .cart-top-buttons{
+      top: 12%;
+    }
+  } 
+  
+
+    {%endif%}
+{%endif%}
+
+
+
+
+.site-nav > li {
+{%if section.settings.mega_menu%}
+position:initial;
+{%else%}
+position:relative;
+{%endif%}
+}
+.dim,
+.dimSearch{
+background-color:{{ overlay_color | hex_to_rgba: overlay_opacity }};
+}
+.promo-bar a {
+color: {{ settings.promo_text_link }};
+}
+</style>
+
+<div data-section-id="{{section.id}}" data-section-type="header">
+<div class="nav-bar">
+{% if section.settings.promo-text != blank and section.settings.promo_enable %}
+{% if section.settings.promo-link != blank%}<a href="{{section.settings.promo-link}}">{%endif%}
+<div class="promo-bar mobile-promo text-center large--hide">
+  {{ section.settings.promo-text }}
+</div>
+{% if section.settings.promo-link != blank%}</a>{%endif%}
+{% endif %}
+<header id="header" data-position="{{section.settings.header_position}}" class="site-header animated fadeIn {%unless section.settings.header_position%}static-padding{%endunless%}">
+  {% if section.settings.promo-text != blank and section.settings.promo_enable %}
+
+ {% if section.settings.promo-link != blank %} <a href="{{section.settings.promo-link}}">{%endif%}
+<div class="promo-bar desk-promo text-center ">
+  {{ section.settings.promo-text }}
+</div>
+{% if section.settings.promo-link != blank%}</a>{%endif%}
+{% endif %}
+<div class="center-nav">
+  <div class="{{ logo_location }}-nav deskNavWrapper">
+  <div class="header-logo {% if section.settings.logo == none %}header-store-name{% endif %}">
+    {% if section.settings.logo == none %}
+    <div class="textFill-parent">
+      {%endif%}
+    <h1 class="site-header__logo-{{ logo_location }} large--{{ logo_location }}" itemscope itemtype="http://schema.org/Organization">
+      {% if section.settings.logo %}
+      <a href="/" itemprop="url" class="site-header__logo-image">
+        {% capture image_size %}{{ section.settings.logo_max_width }}{% endcapture %}
+        <img src="{{ section.settings.logo | img_url: image_size, scale: 2}}"
+             srcset="{{ section.settings.logo | img_url: image_size, scale: 2}} 1x, {{ section.settings.logo | img_url: image_size, scale: 3 }} 2x" alt="{{ section.settings.logo.alt | default: shop.name }}"
+             itemprop="logo">
+      </a>
+      {% else %}
+      <a href="/" itemprop="url"><span>{{ shop.name }}</span></a>
+      {% endif %}
+    </h1>
+     {% if section.settings.logo == none %}
+   </div>
+     {%endif%}
+  </div>
+<div class="header-nav medium-down--hide">
+  <!-- begin site-nav -->
+  <nav aria-label="DesktopNavigation">
+  <ul class="site-nav {%if section.settings.mega_menu == true%}mega-menu{%else%}single-menu{%endif%}" id="AccessibleNav" role="menubar">
+      {% assign mainMenu = section.settings.mainMenu %}      
+      {% for link in linklists[mainMenu].links %}
+      {% comment %}
+      Create a dropdown menu by naming a linklist the same as a link in the parent nav
+      More info on dropdowns:
+      - http://docs.shopify.com/manual/your-website/navigation/create-drop-down-menu
+      {% endcomment %}
+
+      {% if link.links != blank %}
+      <li class="site-nav--has-dropdown{% if link.active %} site-nav--active{% endif %}" aria-haspopup="true" role="menuitem">
+        <a href="{{ link.url }}" class="site-nav__link site-nav--has-dropdown_link">
+          {{ link.title }}
+          <span class="icon icon-arrow-down" aria-hidden="true"></span>
+        </a>
+
+        <!-- begin child link -->
+
+        <div class="nav-menu-js {%if section.settings.mega_menu == true%}main-menu-dropdown{%else%}single-dropdown{%endif%} child-link grid ">
+          <ul class="site-nav__dropdown {% if linklists[grandchild_list_handle].links == blank %}child-div grandchild-link {%endif%} {% if section.settings.mega_ad_image or section.settings.mega-menu-ad-title != blank or section.settings.mega-menu-ad-subtitle != blank %}nav-ul-container{%else%}large--one-whole{%endif%}" role="menu">
+            {% for childlink in link.links %}      
+            {% if childlink.links != blank %}
+            <li class="child-site-nav__link child-div  has-children children-{%if forloop.length <= 5%}{{ forloop.length }}{%else%}5{%endif%}{% if childlink.active %} site-nav--active{% endif %}" role="menuitem" aria-haspopup="true" >
+              <a href="{{ childlink.url }}" class="site-nav__link nav-section-header">{{ childlink.title | escape }}</a>        
+              <span class=" fa fa-angle-right chevron-size single-drop-arrow" aria-hidden="true"></span>  
+              <!-- begin grandchild link -->
+              <div class="grandchild-link mega-child">
+                <ul role="menu">
+                  {% for grandchildlink in childlink.links %}
+                  <li class="{% if grandchildlink.active %} site-nav--active {% endif %} grandchild-{{ forloop.length }}" role="menuitem" >
+                    <a href="{{ grandchildlink.url}}" class="site-nav__link">{{ grandchildlink.title | escape }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>           
+            </li>
+            {% else %}
+            <li class="child-site-nav__link {%if section.settings.mega_menu == true%} children-end {%endif%} site-nav__link child-div children-{%if forloop.length <= 5%}{{ forloop.length }}{%else%}5{%endif%}{% if childlink.active %} site-nav--active{% endif %}" role="menuitem">
+              <a href="{{ childlink.url }}" class="{%if section.settings.mega_menu == true%} nav-section-header{%endif%}">{{ childlink.title | escape }}</a>
+            </li>
+            {%endif%}
+            {% endfor %}
+          </ul>
+          {% if section.settings.mega_ad_image or section.settings.mega-menu-ad-title != blank or section.settings.mega-menu-ad-subtitle != blank  %}
+              <div class="nav-section-ad-container">
+                <div class="nav-section-ad-wrapper nav-section-ad large--one-fifth animated fadeIn">
+                  <div>
+                   {%if section.settings.mega_ad_image%}
+                    {%if section.settings.mega-menu-ad-image-link != blank%}<a href="{{section.settings.mega-menu-ad-image-link}}">{%endif%}
+                    <img src="{{ section.settings.mega_ad_image| img_url: '1024x1024' }}">
+                      {%if section.settings.mega-menu-ad-image-link != blank%}</a>{%endif%}
+                    {%else%}
+                   
+                    <h2>{{section.settings.mega-menu-ad-title | truncatewords:10}}</h2>
+                    {{section.settings.mega-menu-ad-subtitle | truncatewords:20}}
+                    {%if section.settings.mega-menu-ad-cta-text != ''%} <a class="nav-button btn--secondary" href="{{section.settings.mega-menu-ad-cta-text-link}}">{{section.settings.mega-menu-ad-cta-text | truncatewords:5}}</a>{%endif%}
+                    {%endif%}
+                  </div>
+                </div>
+              </div>
+              {%endif%}       
+        </div>
+      </li>
+      {% else %}
+      <li {% if link.active %}class="site-nav--active"{% endif %} role="menuitem">
+        <a href="{{ link.url }}" class="site-nav__link"><span class="hvr-underline-from-left-dark">{{ link.title }}</span></a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+  <!-- //site-nav -->
+</div>
+<div class="large--text-right  medium-down--hide header-icons icon-wrapper">
+  <div class="search-wrapper"  id="search-wrapper">
+    <a class="icon-fallback-text header-icons icon"  href="#" onClick="return false;">
+      {% include 'tbm-icons', icon: 'search' %}
+    </a>
+    <div class="search-dropdown medium-down--hide js-search-dropdown">
+      <div class="wrapper search-content">
+        <form class="medium-down--hide input-group search-bar" action="/search" method="get" role="search">
+          <div class="grid--full one-whole search-grid-wrapper">
+
+
+            <div class="grid__item {% unless section.settings.mega_ad_image or section.settings.mega-menu-ad-title != blank or section.settings.mega-menu-ad-subtitle != blank %}one-whole{%else%}four-fifths{%endunless%}">
+              <div class="grid__item two-thirds search-input-field">
+                {% assign nice_terms = search.terms | split: '??' | first  %}
+                <input type="search" id="searchInput" name="q" value="{{ nice_terms | escape }}" placeholder="{{ 'general.search.placeholder' | t: shop: shop.name  }}" class="input-group-field banner js-search-query" aria-label="{{ 'general.search.placeholder' | t }}">
+              </div>
+              <div class="grid__item one-third search-input-submit">
+                <span class="input-group-btn banner">
+                  <button type="submit" class="btn icon-fallback-text banner js-search-submit">
+                    {{ 'general.search.submit' | t }}
+                  </button>
+                </span>
+              </div>
+              {%if section.settings.advanced_search %}
+              <div class="grid__item one-whole select-dropdown-wrappers text-left">
+                <hr class="search-nav-hr">
+                <h3 class="search-selection-title advanced-title">{{ 'general.search.optional_filters' | t }}</h3>
+              </div>
+              <div class="grid__item one-third select-dropdown-wrappers">
+                <h3 class="search-selection-title">{{ 'general.search.limit_search.title' | t}}</h3>
+                <select id="searchType" class="js-search-type">
+                  <option selected value="">{{ 'general.search.limit_search.all_content' | t }}</option>
+                  <option value="product">{{ 'general.search.limit_search.products' | t }}</option>
+                  <option value="page">{{ 'general.search.limit_search.pages' | t }}</option>
+                  <option value="article">{{ 'general.search.limit_search.blogs' | t }}</option>
+                </select>
+              </div>
+              <div class="grid__item one-third select-dropdown-wrappers">
+                <h3 class="search-selection-title">{{ 'general.search.product_vendor.title' | t }}</h3>
+                <select id="searchVendor" class="js-search-vendor">
+                  <option selected value="">{{ 'general.search.product_vendor.all_vendors' | t }}</option>
+                  {% for product_vendor in shop.vendors %}
+                  <option value="{{ product_vendor }}">{{ product_vendor | link_to_vendor }}</option>
+
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="grid__item one-third select-dropdown-wrappers">
+                <h3 class="search-selection-title">{{ 'general.search.product_type.title' | t }}</h3>
+                <select id="searchProductType" class="js-search-product-type">
+                  <option selected value="">{{ 'general.search.product_type.all_types' | t }}</option>
+                  {% for product_type in shop.types %}
+                  {%unless product_type == ''%}
+                  <option value="{{ product_type }}">{{ product_type | link_to_type  }}</option>
+                  {%endunless%}
+                  {% endfor %}
+                </select>
+              </div>
+              {%endif%}
+
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  {% if shop.customer_accounts_enabled %}
+  <a href="/account">
+    {% include 'tbm-icons', icon: 'account' %}
+  </a>
+  {%endif%}
+
+  <a class="cart-wrapper js-cart-icon" href="/cart">
+    <div id="cart-svg-count" class="cart-item-count{%if cart.item_count > 0%} cart-show{%endif%}{%if cart.item_count > 9%} cart-extra-pad{%endif%}">{{cart.item_count}}</div>
+    <svg id="cart-svg" {% if cart.item_count > 0%} color="{{ settings.color_accent}}" stroke="{{ settings.color_accent}}" {% else %} color="{{ settings.navbar_link_color}}" stroke="{{ settings.navbar_link_color}}"{%endif%} width="30" height="32" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <metadata>image/svg+xml</metadata>   
+      <g>
+        <title>Layer 1</title>
+        <ellipse ry="14.193302" rx="14.193302" id="svg_1" cy="15" cx="15" fill="none"/>
+        <g transform="matrix(0.010131382145231939,0,0,-0.010131382145231939,73.42602923783018,391.16238184995603) " id="g2991">
+          <path {%if cart.item_count > 0%} fill="{{settings.color_accent}}" {%else %} fill="{{ settings.navbar_link_color}}" {%endif%} id="path2993" d="m-5958.837181,36552.43527q0,-53 -37.5,-90.5q-37.5,-37.5 -90.5,-37.5q-53,0 -90.5,37.5q-37.5,37.5 -37.5,90.5q0,53 37.5,90.5q37.5,37.5 90.5,37.5q53,0 90.5,-37.5q37.5,-37.5 37.5,-90.5zm896,0q0,-53 -37.5,-90.5q-37.5,-37.5 -90.5,-37.5q-53,0 -90.5,37.5q-37.5,37.5 -37.5,90.5q0,53 37.5,90.5q37.5,37.5 90.5,37.5q53,0 90.5,-37.5q37.5,-37.5 37.5,-90.5zm128,1088l0,-512q0,-24 -16,-42.5q-16,-18.5 -41,-21.5l-1044,-122q1,-7 4.5,-21.5q3.5,-14.5 6,-26.5q2.5,-12 2.5,-22q0,-16 -24,-64l920,0q26,0 45,-19q19,-19 19,-45q0,-26 -19,-45q-19,-19 -45,-19l-1024,0q-26,0 -45,19q-19,19 -19,45q0,14 11,39.5q11,25.5 29.5,59.5q18.5,34 20.5,38l-177,823l-204,0q-26,0 -45,19q-19,19 -19,45q0,26 19,45q19,19 45,19l256,0q16,0 28.5,-6.5q12.5,-6.5 20,-15.5q7.5,-9 13,-24.5q5.5,-15.5 7.5,-26.5q2,-11 5.5,-29.5q3.5,-18.5 4.5,-25.5l1201,0q26,0 45,-19q19,-19 19,-45z"/>
+        </g>
+        <defs>
+          <circle r="15" cy="15" cx="15" id="svg_17"/>
+          <mask height="30" width="30" y="0" x="0" maskUnits="objectBoundingBox" maskContentUnits="userSpaceOnUse" id="svg_16">
+            <use id="svg_19" xlink:href="#svg_17"/>
+          </mask>
+        </defs>
+      </g>
+    </svg>
+  </a>
+  {% comment %}
+  Show number of items in the cart and total cost in the /cart link
+  Ajax Cart Notes:
+  - #cartCount updates the total number of items in the cart
+  - #cartCost updates the total cost of the cart
+  - Documentation:  http://shopify.com/timber#ajax-cart
+  {% endcomment %}
+  <div class="js-cart-count" style="display:none;">
+    <a href="/cart" class="site-header__cart-toggle js-drawer-open-right">
+      <span class="icon icon-cart" aria-hidden="true"></span>
+      {{ 'layout.cart.title' | t }}
+      (<span id="CartCount">{{ cart.item_count }}</span>
+      {{ 'layout.cart.items_count' | t: count: cart.item_count }}
+      <span id="CartCost">{{ cart.total_price | money }}</span>)
+    </a>
+  </div>
+</div>
+</div>
+</div>
+</header>
+</div>
+
+<div class="dim"></div>
+<div id="NavDrawer" class="drawer drawer--bottom">
+<div class="drawer__header">
+<div class="drawer__close js-drawer-close">
+  <button type="button" class="icon-fallback-text">
+    <span class="icon icon-x" aria-hidden="true"></span>
+    <span class="fallback-text">{{ 'layout.drawers.close_menu' | t }}</span>
+  </button>
+</div>
+</div>
+
+<!-- begin mobile-nav -->
+{% include 'loft-nav' %}
+<div class="mobile__nav-social-media">
+{% if section.settings.navigation_account_enable %}
+{% if shop.customer_accounts_enabled %}
+{% if customer %}
+<div class="mobile-account-link">
+  {% if customer.first_name != blank %}
+  {% capture first_name %}{{ customer.first_name }}{% endcapture %}
+  <a href="/account">{{ 'layout.customer.logged_in_as_html' | t: first_name: first_name }}</a>
+  {% else %}
+  <a href="/account">{{ 'layout.customer.account' | t }}</a>
+  {% endif %}
+</div>
+<div class="mobile-account-link">
+  {{ 'layout.customer.log_out' | t | customer_logout_link }}
+</div>
+{% else %}
+<div class="mobile-account-link">
+  {{ 'layout.customer.log_in' | t | customer_login_link }}
+</div >
+<div class="mobile-account-link">
+  {{ 'layout.customer.create_account' | t | customer_register_link }}
+</div>
+{% endif %}
+{% endif %}
+{% endif %}
+{% if section.settings.navigation_social_enable %}
+{%include "navigation-social-media" %}
+{% endif %}
+</div>
+</div>
+{% if section.settings.ajax_cart_method == "drawer" %}
+<div id="CartDrawer" class="drawer drawer--right">
+<div class="drawer__header">
+<div class="drawer__title h3">{{ 'cart.general.title' | t }}</div>
+<div class="drawer__close js-drawer-close">
+  <button type="button" class="icon-fallback-text">
+    <span class="icon icon-x" aria-hidden="true"></span>
+    <span class="fallback-text">{{ 'cart.general.close_cart' | t | json }}</span>
+  </button>
+</div>
+</div>
+<div id="CartContainer"></div>
+</div>
+{% endif %}
+<div class="large--hide medium-down--show sticky-header">
+{%unless template != "index"%}  <img src=" {{"icon-mobile-search.svg" | asset_url  }}" class="js-mobile-search-open" id="mobile-search-icon" alt="Mobile search icon">{%endunless%}
+
+<div class="search-dropdown-mobile js-mobile-search-dropdown">
+<span class="icon icon-x js-mobile-search-exit" id="mobile-search-exit" aria-hidden="true"></span>
+<div class="wrapper search-content">
+  <form class="medium-down--show input-group search-bar" action="/search" method="get"  role="search">
+    <div class=" one-whole search-grid-wrapper">
+      <div class=" one-whole">
+        <div class=" search-input-field">
+          <input type="search" id="searchInputMobile" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t: shop: shop.name  }}" class="input-group-field banner js-search-query" aria-label="{{ 'general.search.placeholder' | t }}">
+        </div>
+        <div class=" search-input-submit">
+          <span class="input-group-btn banner">
+            <button type="submit" class="btn icon-fallback-text banner js-search-submit">
+              {{ 'general.search.submit' | t }}
+            </button>
+          </span>
+        </div>
+        {%if section.settings.advanced_search %}
+           <div class="mobile-adv-search">
+        <hr>
+        <h2 class="refine-mobile-title">{{ 'general.search.refine_search' | t }}</h2>
+        <div class="grid__item one-whole select-dropdown-wrappers">
+          <h3 class="search-selection-title">{{ 'general.search.limit_search.title' | t }}</h3>
+          <select id="searchTypeMobile" class="js-search-type">
+            <option selected value="">{{ 'general.search.limit_search.all_content' | t}}</option>
+            <option value="product">{{ 'general.search.limit_search.products' | t}}</option>
+            <option value="page">{{ 'general.search.limit_search.pages' | t}}</option>
+            <option value="article">{{ 'general.search.limit_search.blogs' | t}}</option>
+          </select>
+        </div>
+        <div class="grid__item one-whole select-dropdown-wrappers">
+          <h3 class="search-selection-title">{{ 'general.search.product_vendor.title' | t }}</h3>
+          <select id="searchVendorMobile" class="js-search-vendor">
+            <option selected value="">{{ 'general.search.product_vendor.all_vendors' | t }}</option>
+            {% for product_vendor in shop.vendors %}
+            <option value="{{ product_vendor }}">{{ product_vendor | link_to_vendor }}</option>
+
+            {% endfor %}
+          </select>
+        </div>
+        <div class="grid__item one-whole select-dropdown-wrappers">
+          <h3 class="search-selection-title">{{ 'general.search.product_type.title' | t }}</h3>
+          <select id="searchProductTypeMobile" class="js-search-product-type">
+            <option selected value="">{{ 'general.search.product_type.all_types' | t }}</option>
+            {% for product_type in shop.types %}
+            {%unless product_type == ''%}
+            <option value="{{ product_type }}">{{ product_type | link_to_type  }}</option>
+            {%endunless%}
+            {% endfor %}
+          </select>
+        </div>
+        </div>
+        {%endif%}
+      </div>
+    </div>
+  </form>
+</div>
+</div>
+</div>
+<div class="large--hide medium-down--show sticky-footer" data-mobile="{{section.settings.mobile_nav_location}}">
+<div class="one-quarter mobile-hamburger">
+<div class="site-nav--mobile">
+  <button type="button" class="icon-fallback-text site-nav__link js-drawer-open-left" aria-controls="NavDrawer" aria-expanded="false">
+    <span class="icon icon-hamburger" aria-hidden="true"></span>
+    <span class="fallback-text">{{ 'layout.navigation.menu' | t }}</span>
+  </button>
+</div>
+</div>
+<div class="one-half mobile-logo">
+{% if section.settings.logo %}
+<a href="/" itemprop="WebPage" class="site-header__logo-image">
+  {% capture image_size %}{{ section.settings.logo_max_width }}{% endcapture %}
+  <img src="{{ section.settings.logo | img_url: image_size | scale: 2  }} 1x"
+       srcset="{{ section.settings.logo | img_url: image_size, scale: 2 }} 1x, {{ section.settings.logo | img_url: image_size, scale: 2 }} 2x"
+       alt="{{ section.settings.logo.alt | default: shop.name }}"
+       itemprop="logo">
+</a>
+{% else %}
+{% assign store_name = shop.name | size %}
+<a class="shop-name shop-name-{{ store_name }} site-header__logo-text" href="/">{{ shop.name | truncate:30 }}</a>
+{% endif %}
+</div>
+<div class="one-quarter mobile-icon site-nav__link">
+{%unless template == "index"%}
+<a class="icon search-icon js-mobile-search-open" id="sticky-footer-search" href="#" onClick="return false;">
+     <span class="icon icon-search" alt="Mobile search icon"></span>
+</a>
+{%endunless%}
+<a class="cart-wrapper js-cart-mobile-icon" href="/cart">
+  <div id="mobile-cart-svg-count" class="cart-item-count{%if cart.item_count > 0%} cart-show{%endif%}{%if cart.item_count > 9%} cart-extra-pad{%endif%}">{{cart.item_count}}</div>
+  <svg color="{%if cart.item_count > 0%}{{ settings.color_accent}}{%else%}{{ settings.color_mobile_cart}}{%endif%}" width="30" height="30" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <metadata>image/svg+xml</metadata>
+    <g>
+      <title>background</title>
+      <rect fill="none" height="32" width="32" y="-1" x="-1"/>
+    </g>
+    <g>
+      <title>Layer 1</title>
+      <ellipse ry="14.193302" rx="14.193302" cy="15" cx="15" fill="none"  stroke="{%if cart.item_count > 0%} {{ settings.color_accent}} {%else%} {{ settings.color_mobile_cart}}{%endif%}"/>
+      <g transform="matrix(0.010131382145231939,0,0,-0.010131382145231939,73.42602923783018,391.16238184995603) ">
+        <path  {%if cart.item_count > 0%} fill="{{settings.color_accent}}" {% else %} fill="{{ settings.color_mobile_cart}}" {%endif%} d="m-5958.837181,36552.43527q0,-53 -37.5,-90.5q-37.5,-37.5 -90.5,-37.5q-53,0 -90.5,37.5q-37.5,37.5 -37.5,90.5q0,53 37.5,90.5q37.5,37.5 90.5,37.5q53,0 90.5,-37.5q37.5,-37.5 37.5,-90.5zm896,0q0,-53 -37.5,-90.5q-37.5,-37.5 -90.5,-37.5q-53,0 -90.5,37.5q-37.5,37.5 -37.5,90.5q0,53 37.5,90.5q37.5,37.5 90.5,37.5q53,0 90.5,-37.5q37.5,-37.5 37.5,-90.5zm128,1088l0,-512q0,-24 -16,-42.5q-16,-18.5 -41,-21.5l-1044,-122q1,-7 4.5,-21.5q3.5,-14.5 6,-26.5q2.5,-12 2.5,-22q0,-16 -24,-64l920,0q26,0 45,-19q19,-19 19,-45q0,-26 -19,-45q-19,-19 -45,-19l-1024,0q-26,0 -45,19q-19,19 -19,45q0,14 11,39.5q11,25.5 29.5,59.5q18.5,34 20.5,38l-177,823l-204,0q-26,0 -45,19q-19,19 -19,45q0,26 19,45q19,19 45,19l256,0q16,0 28.5,-6.5q12.5,-6.5 20,-15.5q7.5,-9 13,-24.5q5.5,-15.5 7.5,-26.5q2,-11 5.5,-29.5q3.5,-18.5 4.5,-25.5l1201,0q26,0 45,-19q19,-19 19,-45z"/>
+      </g>
+      <defs>
+        <circle r="15" cy="15" cx="15"/>
+        <mask height="30" width="30" y="0" x="0" maskUnits="objectBoundingBox" maskContentUnits="userSpaceOnUse">
+          <use xlink:href="#svg_17"/>
+        </mask>
+      </defs>
+    </g>
+  </svg>
+</a>
+</div>
+</div>
+</div>
+
+{% schema %}
+{
+"name": "Header",
+"class": "section-header",
+"settings": [
+{
+"type": "checkbox",
+"id": "header_position",
+"label": "Sticky header",
+"default": true
+},
+{
+"type": "select",
+"id": "mobile_nav_location",
+"label":"Mobile header location",
+"options": [
+{
+"value": "top",
+"label": "Top"
+},
+{
+"value": "bottom",
+"label": "Bottom"
+}
+],
+"default": "bottom",
+"label": "Mobile nav location"
+},
+{
+"type": "header",
+"content": "Logo"
+},
+{
+"type": "select",
+"id": "logo-location",
+"options": [
+{
+"value": "left",
+"label": "Left aligned"
+},
+{
+"value": "center",
+"label": "Centered"
+}
+],
+"default": "left",
+"label": "Alignment"
+},
+{
+"type": "image_picker",
+"id": "logo",
+"label": "Custom logo",
+"info": "450 x 200px .png"
+},
+{
+"type":   "range",
+"id":     "logo_max_width",
+"min":       50,
+"max":       300,
+"step":      25,
+"unit":       "px",
+"label":     "Max logo width",
+"default":   100
+},
+{
+"type": "header",
+"content": "Main menu navigation options"
+},
+{
+"type": "link_list",
+"id": "mainMenu",
+"label": "Main menu linklist",
+"default": "main-menu"
+},
+{
+"type": "checkbox",
+"id": "mega_menu",
+"label": "Enable mega-menu layout",
+"default": true
+},
+{
+"type": "color",
+"id": "mega-nav-overlay-color",
+"label": "Overlay color",
+"default": "#ffffff"
+},
+{
+"type":   "range",
+"id":     "mega-nav-overlay-opacity",
+"min":       0,
+"max":       90,
+"step":      10,
+"unit":       "%",
+"label":     "Overlay opacity",
+"default":   60
+},
+{
+"type": "header",
+"content": "Mobile options navigation"
+},
+{
+"type": "link_list",
+"id": "mobileMenu",
+"label": "Mobile menu linklist",
+"default": "main-menu"
+},
+{
+"type": "checkbox",
+"id": "navigation_account_enable",
+"label": "Show account links",
+"default": false
+},
+{
+"type": "checkbox",
+"id": "navigation_social_enable",
+"label": "Show social icons",
+"default": false
+},
+{
+"type": "header",
+"content": "Announcement bar",
+"info": "Display a promotional message"
+},
+{
+"type": "checkbox",
+"id": "promo_enable",
+"label": "Enable announcement bar",
+"default": true
+},
+{
+"type": "text",
+"id": "promo-text",
+"label": "Announcement text",
+"default": "Announce something exciting!"
+},
+{
+"type": "url",
+"id": "promo-link",
+"label": "CTA link"
+},
+{
+"type": "header",
+"content": "Navigation ad",
+"info": "Ad shows on mega navigation."
+},
+{
+"type": "text",
+"id": "mega-menu-ad-title",
+"label": "Ad title",
+"default": "Navigation ad space"
+},
+{
+"type": "richtext",
+"id": "mega-menu-ad-subtitle",
+"label": "Subheader",
+"default": "<p>Highlight promotions</p>"
+},
+{
+"type": "text",
+"id": "mega-menu-ad-cta-text",
+"label": "CTA text",
+"default": "Shop"
+},
+{
+"type": "url",
+"id": "mega-menu-ad-cta-text-link",
+"label": "CTA link"
+},
+{
+"type": "image_picker",
+"id": "mega_ad_image",
+"label": "AD image"
+},
+{
+"type": "url",
+"id": "mega-menu-ad-image-link",
+"label": "AD image link"
+},
+{
+"type": "header",
+"content": "Search"
+},
+{
+"type": "checkbox",
+"id": "advanced_search",
+"label": "Enable advanced search",
+"default": true
+}
+]
+}
+{% endschema %}

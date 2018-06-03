@@ -1,0 +1,21 @@
+<div id="{{list_handle}}-mnav" class="mobile-nav__link-group" {%unless list_handle == select_handle%}style="display:none"{%endunless%}>
+  <div>
+    {% if list_handle == select_handle%}
+    <h3 class="mobile-linklist-title">{{list_title}}</h3>
+    <hr class="mobile-menu-hr">
+    {% else %}
+    <h3 class="mobile-linklist-title">
+      <span class='go-back'><span class="fa fa-angle-left chevron-size "></span>{{list_title}}</span></h3>
+    <hr class="mobile-menu-hr">
+    {% endif %}
+  </div>
+
+  <ul>
+
+    {% for link in linklists[list_handle].links %}
+    {% assign link_title = link.title %}
+    {% assign link_handle = link.title | handleize %}
+    {% include 'loft-nav-item' %}
+    {% endfor %}
+  </ul>
+</div>

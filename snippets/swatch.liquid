@@ -1,0 +1,170 @@
+{% comment %}
+  Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
+{% endcomment %}
+{% assign swatchIndex = index %}
+{% assign colPage = collPage %}
+{% assign swatchTotal = total %}
+{%- assign varGenProd = product -%}
+{%- assign mainVariant = varGenProd.selected_or_first_available_variant -%}
+
+{% assign file_extension = 'png' %}
+{%- assign sharedSelectClasses = 'product-single__variants mobile-prod-padding' | append:' ' -%}
+{%- assign singleOpSelectClasses = sharedSelectClasses | append:'single-variant-available' -%}
+{%- assign multiOpSelectClasses =  sharedSelectClasses | append:'multiop-select' -%}
+{% if swatch == blank %}
+<div class="swatch error">
+  <p>You must include the snippet swatch.liquid with the name of a product option.</p> 
+  <p>Use: <code>{% raw %}{% include 'swatch' with 'name of your product option here' %}{% endraw %}</code></p>
+  <p>Example: <code>{% raw %}{% include 'swatch' with 'Color' %}{% endraw %}</code></p>
+</div>
+{% else %}
+
+{% assign found_option = false %}
+{% assign is_color = false %}
+{% assign option_index = 0 %}
+
+{% for option in product.options %}
+  {% if option == swatch %}
+    {% assign found_option = true %}
+    {% assign option_index = forloop.index0 %}
+    <style>
+      label[for="product-select-option-{{ option_index }}"] { display: none; }
+      #product-select-option-{{ option_index }} { display: none; }
+      #product-select-option-{{ option_index }} + .custom-style-select-box { display: none !important; }
+    </style>
+    <script>$(window).load(function() { $('.selector-wrapper:eq({{ option_index }})').hide(); });</script>
+    {% assign downcased_option = swatch | downcase %}
+    {% if downcased_option contains 'color' or downcased_option contains 'colour' %}
+      {% assign is_color = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% unless found_option %}
+
+{% else %}
+
+{%if colPage %}
+{% assign colorCount = 0 %}
+<div class="swatch clearfix" >
+  {% assign values = '' %}
+  {% for variant in product.variants %}
+    {% assign value = variant.options[option_index] %}
+    {% unless values contains value %}
+      {% assign values = values | join: ',' %}
+      {% assign values = values | append: ',' | append: value %} 
+      {% assign values = values | split: ',' %}
+      <div class="swatch-element color {% if variant.available %}available{% else %}soldout{% endif %}">
+        {% if is_color %}
+        <div class="tooltip">{{ value }}</div>
+        {% endif %}
+        <div id="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %}disabled{% endunless %}  {% unless variant.available %}data-unavailable="true"{% endunless %} class="colSwatch"/>
+        {% if is_color %}
+        {% assign colorCount = colorCount | plus:1 %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %} class="disabled-swatch" {%endunless%} style="background-color: {{ value | split: ' ' | last | handle }}; background-image: url({{ value | handle | append: '.' | append: file_extension | asset_url }})">
+           <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+      </div>
+        {% endif %}
+      </div>
+    {% endunless %}
+    {% if variant.available %}
+      <script>
+      $(function(){
+        jQuery('.swatch[data-option-index="{{ option_index }}"] .{{ value | handle }}').removeClass('soldout').addClass('available').find('div.colSwatch').removeAttr('disabled');
+      });
+      </script>
+    {% endif %}
+    {%if colorCount >= 21%}
+    {% break %}
+    {%endif%}
+  {% endfor %}
+</div>
+  {%break%}
+{%endif%}
+
+
+
+{% if swatchTotal == 1 %}
+<div class="swatch clearfix"  name="id" id="productSelect" class="{{ singleOpSelectClasses }}" data-prod-base-price="{{ varGenProd.price }}" data-option-index="{{ option_index }}">
+  <div class="header">{{ swatch }}</div>
+  {% assign values = '' %}
+  {% for variant in product.variants %}
+    {% assign value = variant.options[option_index] %}
+    {% unless values contains value %}
+      {% assign values = values | join: ',' %}
+      {% assign values = values | append: ',' | append: value %} 
+      {% assign values = values | split: ',' %}
+      <div class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }} {% if variant.available %}available{% else %}soldout{% endif %}" >
+        {% if is_color %}
+        <div class="tooltip">{{ value }}</div>
+        {% endif %}
+        <input id="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" type="radio" name="id" {% if mainVariant == variant%} checked{% endif %} {% unless variant.available %}disabled{% endunless %} data-sku="{{ variant.sku }}" value="{{ variant.id }}" data-base-price="{{variant.price }}" {% unless variant.compare_at_price == blank %}data-compare-price="{{ variant.compare_at_price }}"{%endunless%} {% unless variant.available %}data-unavailable="true"{% endunless %} data-img-id="{{ variant.featured_image.id }}" data-title="{{variant.title}}"/>
+        {% if is_color %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %} class="disabled-swatch" {%endunless%} style="background-color: {{ value | split: ' ' | last | handle }}; background-image: url({{ value | handle | append: '.' | append: file_extension | asset_url }})">
+           <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+        {% else %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %} class="disabled-swatch" {%endunless%}>
+          {{ value }}
+           <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+        {% endif %}
+      </div>
+    {% endunless %}
+    {% if variant.available %}
+      <script>
+            $(function(){
+        jQuery('.swatch[data-option-index="{{ option_index }}"] .{{ value | handle }}').removeClass('soldout').addClass('available').find(':radio').removeAttr('disabled');
+      });
+      </script>
+    {% endif %}
+  {% endfor %}
+</div>
+
+
+{%else%}
+{%comment%}
+For multiple options to tie into JS
+{%endcomment%}
+<div class="swatch clearfix multiop-select" id="productSelect-op{{ swatchIndex }}" data-prod-base-price="{{ varGenProd.price }}" data-option-index="{{ option_index }}" data-opnum="{{ swatchIndex }}">
+  <div class="header">{{ swatch }}</div>
+  {% assign values = '' %}
+  {% for variant in product.variants %}
+    {% assign value = variant.options[option_index] %}
+    {% unless values contains value %}
+      {% assign values = values | join: ',' %}
+      {% assign values = values | append: ',' | append: value %} 
+      {% assign values = values | split: ',' %}
+      <div data-value="{{ value | escape }}"  data-img-id="{{ variant.featured_image.id }}" class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }} {% if variant.available %}available{% else %}soldout{% endif %} {% if mainVariant.title contains value %} selected{% endif %}">
+        {% if is_color %}
+        <div class="tooltip">{{ value }}</div>
+        {% endif %}
+        <input id="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" value="{{ value | escape }}" type="radio" name="option-{{ option_index }}" {% if mainVariant.title contains value %} checked{% endif %}  data-img-id="{{ variant.featured_image.id }}" data-title="{{variant.title}}"  />
+        {% if is_color %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %} class="disabled-swatch"{%endunless%} style="background-color: {{ value | split: ' ' | last | handle }}; background-image: url({{ value | handle | append: '.' | append: file_extension | asset_url }})">
+          <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+        {% else %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}-{{section.id}}" {% unless variant.available %}{% unless is_color %}class="disabled-swatch"{%endunless%}{%endunless%}>
+          {{ value }}
+          <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+        {% endif %}
+      </div>
+    {% endunless %}
+    {% if variant.available %}
+      <script>
+        $(function(){
+        jQuery('.swatch[data-option-index="{{ option_index }}"] .{{ value | handle }}').removeClass('soldout').addClass('available').find(':radio').removeAttr('disabled');
+        })
+      </script>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{%endif%}
+
+{% endunless %}
+
+{% endif %}

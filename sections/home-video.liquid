@@ -1,0 +1,84 @@
+{% if section.settings.info %}
+  {% assign video_info = 1 %}
+  {% else %}
+  {% assign video_info = 0 %}
+{% endif %}
+
+{% if section.settings.autoplay %}
+  {% assign video_autoplay = 1 %}
+  {% else %}
+  {% assign video_autoplay = 0 %}
+{% endif %}
+
+
+{% if section.settings.loop %}
+  {% assign video_loop = 1 %}
+  {% else %}
+  {% assign video_loop = 0 %}
+{% endif %}
+
+<div data-section-id="{{section.id}}" data-section-type="video">
+
+  {% if section.settings.heading != blank %}
+    <div class="section-header">
+      <h2 class="mobile-header-space instagram-title text-center">{{ section.settings.heading | escape }}</h2>
+    </div>
+  {% endif %}
+<div class="grid--full card-shadow">
+      <div class="video-wrapper">
+        {% if section.settings.video_url == blank %}
+          <iframe src="//www.youtube.com/embed/_9VUPq3SxOc?rel=0&showinfo={{ video_info }}&autoplay={{ video_autoplay }}&loop={{ video_loop }}{% if section.settings.loop %}&playlist={{ section.settings.video_url.id }}{% endif %}&vq=720" width="850" height="480" frameborder="0" allowfullscreen></iframe>
+        {% else %}
+          {% if section.settings.video_url.type == "youtube" %}
+            <iframe src="//www.youtube.com/embed/{{ section.settings.video_url.id }}?rel=0&showinfo={{ video_info }}&autoplay={{ video_autoplay }}&loop={{ video_loop }}{% if section.settings.loop %}&playlist={{ section.settings.video_url.id }}{% endif %}&vq=720" width="850" height="480" frameborder="0" allowfullscreen></iframe>
+          {% endif %}
+        {% endif %}
+      </div>
+</div>
+</div>
+
+{% schema %}
+  {
+    "name": "Video",
+    "class": "section-margin home-banner-cta",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Video"
+      },
+      {
+        "type": "checkbox",
+        "id": "info",
+        "label": "Show video info",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "autoplay",
+        "label": "Autoplay video",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "loop",
+        "label": "Loop video",
+        "default": false
+      },
+      {
+        "type": "video_url",
+        "id": "video_url",
+        "label": "Video link",
+        "accept": ["youtube"]
+      }
+
+    ],
+    "presets": [
+      {
+        "name": "Video",
+        "category": "Video"
+      }
+    ]
+  }
+{% endschema %}

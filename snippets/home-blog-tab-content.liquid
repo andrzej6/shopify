@@ -1,0 +1,126 @@
+<div id="tab-{{ forloop.index }}" class="tab-content {% if article_limit != 1 %}tab-padding {% endif %} grid__item {% if article_limit != 1 %}five-sixths {% else %} four-fifths {% endif %}{% if forloop.first %} current{% endif %} medium-down--one-whole js-tab-{{ forloop.index }}">
+{% assign article_limit = block.settings.article_limit %}
+{% comment %}
+Check if we should show onboarding
+{% endcomment %}
+
+{% if blogs[blog_chosen] == blank or blogs[blog_chosen].articles_count == 0 %}
+
+{% comment %}
+Show onboarding content. Determine how many placeholder articles to show.
+{% endcomment %}
+
+<div class="grid__full">
+{% for i in (1..article_limit) %}
+<div class="grid__item home-blog-article-wrapper {% if article_limit == 1 %}one-whole{% elsif article_limit == 2 %} one-half {% else %} one-third {% endif %}">
+<div class="grid--full {% if article_limit == 1 %}single-blog-flex{% endif %}">
+<div class="grid__item {% if article_limit == 1 %}large--three-fifths medium-down--one-whole{% else %} one-whole{% endif %} home-blog-padding">
+    {% if article_limit != 1 %}
+      <div class="home-blog-image blog-image-padding" style="background-image: url({{ 'placeholder-blog.png' | asset_url }});"></div>
+    {% endif %}
+<a href="#">
+  <h1 class="home-blog-text">{% cycle "First", "Second", "Third" %} featured blog post</h1>
+</a>
+ {% if section.settings.homepage-blog-article-date %}
+   <div class="home-blog-author">Publish date</div>
+ {%endif%}
+<div class="rte home-blog-text">
+  <p>This is your store’s blog. You can use it to talk about new product launches, experiences, tips or other news you want your customers to read about. Check out Shopify’s ecommerce blog for inspiration and advice... <br><br>The first 300 words of each featured blog are displayed here.</p>
+</div>
+<a class="hvr-underline-from-left-dark" href="#">
+  <h4>{{ 'blogs.article.read_more' | t }}</h4>
+</a>
+</div>
+{% if article_limit == 1 %}
+<div class="grid__item large--two-fifths medium-down--one-whole home-blog-image blog-image-padding" style="background-image: url({{ 'placeholder-blog.png' | asset_url }});"></div>
+{% endif %}
+{% unless forloop.last %}
+    <hr class="home-article-hr">
+    {% endunless %}
+</div>
+</div>
+{% endfor %}
+</div>
+
+{% else %}
+
+{% comment %}
+A blog has been assigned. Show actual content
+{% endcomment %}
+
+<div class="grid__full">
+{% for article in blogs[blog_chosen].articles limit: article_limit %}
+
+  <div class="grid__item home-blog-article-wrapper {% if article_limit == 1 %}one-whole{% elsif article_limit == 2 %} one-half {% else %} one-third {% endif %}">
+    <div class="grid--full {% if article_limit == 1 %}single-blog-flex{% endif %}">
+      <div class="grid__item  {% if article.image %} {% if article_limit == 1 %}large--three-fifths medium-down--one-whole{% else %} one-whole{% endif %}{%else%}one-whole{%endif%} home-blog-padding">
+        {% if article_limit != 1 and article.image %}
+          <div class="home-blog-image blog-image-padding lazyload lazypreload" 
+          data-bgset="{% include 'bgset', image: article.image %}"
+          data-sizes="auto"
+          data-parent-fit="cover" 
+          style="background-image: url({{ article | img_url: "300x300"}});"></div>
+        {% endif %}
+
+        <a href="{{ article.url }}">
+          {% if article_limit != 1 %}
+            <h2 class="home-blog-text">{{ article.title | truncatewords: 5 }}</h2>
+          {% else %}
+            <h1 class="home-blog-text">{{ article.title | truncatewords: 5 }}</h1>
+          {% endif %}
+        </a>
+        {% if section.settings.homepage-blog-article-date %}
+            <div class="home-blog-author">{{ article.published_at | date: "%b %d" }}</div>
+        {%endif%}
+        <div class="rte home-blog-text">
+         {% if article.excerpt_or_content.size > 0 %}
+            {% if article_limit == 1 %}
+              {{ article.excerpt_or_content | strip_html | truncatewords: 25 }}
+            {% else %}
+              {{ article.excerpt_or_content | strip_html | truncatewords: 10 }}
+            {% endif %}
+          {% else %}
+            {% if article_limit == 1 %}
+              <p>{{ article.content | strip_html | truncatewords: 25 }}</p>
+            {% else %}
+              <p>{{ article.content | strip_html | truncatewords: 10 }}</p>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <a class="hvr-underline-from-left-dark" href="{{ article.url }}">
+          <h4>{{ 'blogs.article.read_more' | t }}</h4>
+        </a>
+      </div>
+
+      {% if article.image and article_limit == 1 %}
+
+        {% comment %}
+        Check to see if we should show onboarding content
+        {% endcomment %}
+
+          <div class="grid__item large--two-fifths medium-down--one-whole">
+          {% if article.image %}
+            <div class="home-blog-image lazyload lazypreload" 
+            data-bgset="{% include 'bgset', image: article.image %}"
+            data-sizes="auto"
+            data-parent-fit="cover" 
+            style="background-image: url({{ article | img_url: "300x300"}});"></div>
+            {% else %}
+            <div class="home-blog-image" style="background-image: url({{ 'placeholder-blog.png' | asset_url }});"></div>
+            {% comment %}
+            Show single post onboarding image
+            {% endcomment %}
+          {% endif %}
+          </div>
+
+      {% endif %}
+
+      {% unless forloop.last %}
+    <hr class="home-article-hr">
+    {% endunless %}        </div>
+  </div>
+{% endfor %}
+</div>
+{% endif %}
+</div>

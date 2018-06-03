@@ -1,0 +1,64 @@
+{% comment %}
+Check if the product is on sale and set a variable to be used below.
+{% endcomment %}
+{%- assign on_sale = false -%}
+{% if product.compare_at_price_varies %}
+{%- assign on_sale = true -%}
+{% endif %}
+
+{% comment %}
+Check if the product is sold out and set a variable to be used below.
+{% endcomment %}
+{%- assign sold_out = true -%}
+{% if product.available %}
+{%- assign sold_out = false -%}
+{% endif %}
+
+<div class="product-details" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+  <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+  <link itemprop="availability" href="http://schema.org/{% if sold_out %}OutOfStock{% else %}InStock{% endif %}">
+  
+  {% comment %}
+  ID addToCartForm is a selector for the ajax cart plugin
+  {% endcomment %}
+   
+
+   {% if product == empty %}
+     <form action="/cart/add" method="post" enctype="multipart/form-data" id="addToCartForm-{{ section.id }}" class="form-vertical">
+     {% include 'variant-selects' %}
+      
+      <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+      <span id="ProductPrice-{{ section.id }}" class="visually-hidden js-prod-price" itemprop="price" content="{{ current_variant.price | divided_by: 100 }}">
+        {{ current_variant.price | money }}
+      </span>
+
+     <button type="submit" name="add" id="AddToCart" {% if sold_out %}disabled{% endif %} class="btn btn-{{block.id}} js-prod-disable-on-soldout">  
+        <span id="AddToCartTextSoldOut" class="js-prod-soldout-btn-text js-prod-show-soldout" {% unless sold_out %}style="display:none"{% endunless %}>{{ 'products.product.sold_out' | t }}</span>
+        <span id="AddToCartText" class="js-prod-show-available"{% if sold_out %}style="display:none"{% endif %}>{{ 'products.product.add_to_cart' | t }}</span>
+      </button>
+    </form>
+   {%else%}
+    {%capture formID%}AddToCartForm-{{ section.id }} {%endcapture%} 
+    {% form 'product', product, id: formID, class: 'form-vertical' %}
+    
+      {% include 'variant-selects'%}
+      
+      <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
+      <span id="ProductPrice-{{ section.id }}" class="visually-hidden js-prod-price" itemprop="price" content="{{ current_variant.price | divided_by: 100 }}">
+        {{ current_variant.price | money }}
+      </span>
+      
+       <div class="smart-wrapper smart-block-{{block.id}}">
+      <button type="submit" name="add" id="AddToCart" {% if sold_out %}disabled{% endif %} class="btn btn-{{block.id}} js-prod-disable-on-soldout">  
+        <span id="AddToCartTextSoldOut" class="js-prod-soldout-btn-text js-prod-show-soldout" {% unless sold_out %}style="display:none"{% endunless %}>{{ 'products.product.sold_out' | t }}</span>
+        <span id="AddToCartText" class="js-prod-show-available"{% if sold_out %}style="display:none"{% endif %}>{{ 'products.product.add_to_cart' | t }}</span>
+      </button>
+        {%if block.settings.enable_payment_button%}
+          {{ form | payment_button }}
+         {%endif%}
+       </div>
+     
+   {% endform %}
+   {%endif%}
+
+</div>

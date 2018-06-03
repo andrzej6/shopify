@@ -1,0 +1,25 @@
+<!-- /snippets/search-bar.liquid -->
+{% comment %}
+A snippet to include a search bar anywhere in your theme.
+Note we are using 'input-group' for the layout. Look under Forms > Input Groups for some demos.
+
+More information:
+- http://docs.shopify.com/themes/liquid-variables/search
+
+To return only products in results:
+- http://docs.shopify.com/manual/configuration/store-customization/return-only-product-in-storefront-search-results
+- Or manually add type=product to the search URL as a query parameter
+- Uncomment hidden input with value="product" below
+{% endcomment %}
+
+{% unless nice_terms %}
+  {% assign nice_terms = search.terms | replace:'**', '' | split: '??' | first  %}
+{% endunless %}
+<form class="medium-down--one-whole input-group search-bar search-bar-snippet" action="/search" method="get" role="search">
+  <input type="search" name="q" value="{{ nice_terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" class="input-group-field banner" {%if searched == 1 %}aria-label="{{ 'general.search.placeholder' | t }}"{%endif%}>
+ <span class="input-group-btn banner">
+    <button type="submit" class="btn icon-fallback-text banner js-base-search">
+      {{ 'general.search.submit' | t }}
+    </button>
+  </span>
+</form>

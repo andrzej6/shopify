@@ -1,0 +1,129 @@
+
+<!-- /snippets/product-grid-item.liquid -->
+{% include 'image-style' %}
+{%assign grid_item_width_b = collection-grid-item%}
+{% comment %}
+
+This snippet is used to showcase each product during the loop,
+'for product in collection.products' in collection.liquid.
+
+A liquid variable (grid_item_width) is set just before the this
+snippet is included to change the size of the container.
+Once the variable is set on a page, all future instances of this
+snippet will use that width. Overwrite the variable to adjust this.
+
+Example
+- assign grid_item_width = 'large--one-quarter medium--one-half'
+
+{% endcomment %}
+
+{% comment %}
+Set the default grid_item_width if no variable is set
+{% endcomment %}
+
+{% unless grid_item_width_b %}
+{% assign grid_item_width_b = 'large--one-quarter medium--one-half' %}
+{% endunless %}
+
+{% comment %}
+Check if the product is on sale and set a variable to be used below.
+{% endcomment %}
+{% assign on_sale = false %}
+{% if product.compare_at_price_varies %}
+{% assign on_sale = true %}
+{% endif %}
+
+{% comment %}
+Check if the product is sold out and set a variable to be used below.
+{% endcomment %}
+{% assign sold_out = true %}
+{% if product.available %}
+{% assign sold_out = false %}
+{% endif %}
+
+
+<div class="grid__item {{ grid_item_width_b }} text-center collection-item-height collection-grid-item-snippet">
+
+  {% comment %}
+  Link to your product with the 'within: collection' filter for the link to be aware of the collection.
+  This allows you to create collection-based navigation on the product page.
+
+  Results of using 'within: collection':
+  - Instead of a URL with /products/product-handle
+  you would get /collections/collection-handle/products/product-handle
+
+  For more info on navigation within a collection
+  - http://docs.shopify.com/support/your-store/collections/how-to-navigate-within-a-collection
+
+  {% endcomment %}
+  <div class="jim-test content-class card-shadow {%if sold_out%} unavailble{%endif%}" style="position: relative;">
+    {%if on_sale and sold_out != true%}
+    <div class="on-sale">
+      {% include 'tbm-icons', icon: 'sale' %}
+    </div>
+    {%elsif sold_out and on_sale != true%}
+    <div class="sold-out">
+      {% include 'tbm-icons', icon: 'soldout'%}
+    </div>
+    {%elsif on_sale and sold_out%}
+    <div class="sold-out">
+      {% include 'tbm-icons', icon: 'soldout'%}
+    </div>
+    {%endif%}
+    <a href="{{ product.url | within: collection }}" class="grid__image collection-product-link">
+
+
+          {% assign img_url = product.featured_image.src  | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+          <img class="{%if grid_item_width_b == "large--one-half" %} collection-product-featured-img{%else%}collection-product-img{%endif%} lazyload lazystretch"
+            src="{{ product.featured_image.src | img_url: '300x' }}"
+            data-src="{{ img_url }}"
+            data-widths="[540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+            data-aspectratio="{{ product.featured_image.src.aspect_ratio }}"
+            data-sizes="auto"
+            data-parent-fit="cover"
+            alt="{{ product.featured_image.src.alt }}">
+
+
+      <div class="product-overlay">
+        <div class="product-overlay-position">
+          <h2 class="h2 product-title">{{ product.title | truncatewords:10 }}</h2>
+
+          {% comment %}
+          You can show a leading 'from' or 'up to' by checking 'product.price_varies'
+          if your variants have different prices.
+          {% endcomment %}
+
+          {% if on_sale %}
+          {% if product.price_varies %}
+          {% assign sale_price = product.price | money %}
+          <p class="h2 product-price">{{ 'products.product.on_sale_from_html' | t: price: sale_price }}</p>
+          {% else %}
+          <p class="h2 product-price test">{{ product.price | money }}</p>
+          {% endif %}
+          {% else %}
+          {% if product.price_varies %}
+          {% assign price = product.price | money %}
+          <p class="h2 product-price">{{ 'products.general.from_text_html' | t: price: price }}</p>
+          {% else %}
+          <p class="h2 product-price">{{ product.price | money }}</p>
+          {% endif %}
+          {%endif%}
+
+          {% if settings.use_swatches %}
+                {% for option in product.options %}
+                    {% if option == 'Color'%}
+                      {% include 'swatch' with option, total:0, collPage: true%}
+                    {% endif %}
+               {% endfor %}
+           {% endif %}
+
+          {%if settings.enable_quick%}
+              <div data-fancybox data-type="ajax" data-src="{{shop.url}}{{product.url}}" data-filter="#quick" href="javascript:;" class="quick-view">
+              {{'products.general.quick_view' | t }}
+            </div>
+         {% endif %}
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
